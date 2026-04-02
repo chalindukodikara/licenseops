@@ -5,6 +5,7 @@ import (
 	"os"
 	"time"
 
+	"github.com/chalindu/licenser/internal/spdx"
 	"gopkg.in/yaml.v3"
 )
 
@@ -13,6 +14,7 @@ type Config struct {
 	License         string   `yaml:"license"`
 	CopyrightHolder string   `yaml:"copyright-holder"`
 	Year            string   `yaml:"year"`
+	Format          string   `yaml:"format"`
 	HeaderTemplate  string   `yaml:"header-template"`
 	Paths           []string `yaml:"paths"`
 	Exclude         []string `yaml:"exclude"`
@@ -25,6 +27,7 @@ func Defaults() Config {
 	t := true
 	return Config{
 		Year:          fmt.Sprint(time.Now().Year()),
+		Format:        "spdx",
 		Paths:         []string{"."},
 		SkipGenerated: &t,
 		Gitignore:     &t,
@@ -66,6 +69,9 @@ func Load(path string) (Config, error) {
 	if fileCfg.Year != "" {
 		cfg.Year = fileCfg.Year
 	}
+	if fileCfg.Format != "" {
+		cfg.Format = fileCfg.Format
+	}
 	if fileCfg.HeaderTemplate != "" {
 		cfg.HeaderTemplate = fileCfg.HeaderTemplate
 	}
@@ -85,18 +91,53 @@ func Load(path string) (Config, error) {
 	return cfg, nil
 }
 
-// Validate checks that required fields are set.
-func (c *Config) Validate() error {
+// Validate checks that required fields are set and consistent.
+func (c *Config) Validate() (warnings []string, err error) {
 	if c.License == "" {
-		return fmt.Errorf("license is required (set via config or --license flag)")
+		return nil, fmt.Errorf("license is required (set via config or --license flag)")
 	}
-	if c.CopyrightHolder == "" {
-		return fmt.Errorf("copyright-holder is required (set via config or --owner flag)")
+
+	// Validate license (single ID or expression)
+	w, err := spdx.ValidateLicense(c.License)
+	if err != nil {
+		return nil, err
 	}
-	if !IsValidLicense(c.License) {
-		return fmt.Errorf("unknown SPDX license identifier: %q (use a valid SPDX ID)", c.License)
+	warnings = append(warnings, w...)
+
+	// Format-specific validation
+	switch c.Format {
+	case "spdx", "":
+		// copyright-holder is optional for spdx (1-line mode without it)
+	case "reuse":
+		if c.CopyrightHolder == "" {
+			return warnings, fmt.Errorf("copyright-holder is required for 'reuse' format")
+		}
+	case "apache-long":
+		if c.CopyrightHolder == "" {
+			return warnings, fmt.Errorf("copyright-holder is required for 'apache-long' format")
+		}
+		if c.License != "Apache-2.0" {
+			return warnings, fmt.Errorf("'apache-long' format requires license: Apache-2.0 (got %q)", c.License)
+		}
+	case "gpl-long":
+		if c.CopyrightHolder == "" {
+			return warnings, fmt.Errorf("copyright-holder is required for 'gpl-long' format")
+		}
+		if !spdx.IsGPLFamily(c.License) {
+			return warnings, fmt.Errorf("'gpl-long' format requires a GPL/LGPL/AGPL license (got %q)", c.License)
+		}
+	case "custom":
+		if c.HeaderTemplate == "" {
+			return warnings, fmt.Errorf("header-template is required when format is 'custom'")
+		}
+		if _, err := os.Stat(c.HeaderTemplate); err != nil {
+			return warnings, fmt.Errorf("header template file not found: %s", c.HeaderTemplate)
+		}
+	default:
+		return warnings, fmt.Errorf("unknown format: %q (valid: spdx, reuse, apache-long, gpl-long, custom)", c.Format)
 	}
-	return nil
+
+	return warnings, nil
 }
 
 // ShouldSkipGenerated returns whether generated files should be skipped.
@@ -107,33 +148,4 @@ func (c *Config) ShouldSkipGenerated() bool {
 // ShouldUseGitignore returns whether .gitignore patterns should be respected.
 func (c *Config) ShouldUseGitignore() bool {
 	return c.Gitignore == nil || *c.Gitignore
-}
-
-// validLicenses is the set of recognized SPDX identifiers.
-var validLicenses = map[string]bool{
-	"Apache-2.0":      true,
-	"MIT":             true,
-	"GPL-2.0-only":    true,
-	"GPL-2.0-or-later": true,
-	"GPL-3.0-only":    true,
-	"GPL-3.0-or-later": true,
-	"LGPL-2.1-only":   true,
-	"LGPL-2.1-or-later": true,
-	"LGPL-3.0-only":   true,
-	"LGPL-3.0-or-later": true,
-	"BSD-2-Clause":    true,
-	"BSD-3-Clause":    true,
-	"MPL-2.0":         true,
-	"AGPL-3.0-only":   true,
-	"AGPL-3.0-or-later": true,
-	"ISC":             true,
-	"Unlicense":       true,
-	"BSL-1.0":         true,
-	"0BSD":            true,
-	"CC0-1.0":         true,
-}
-
-// IsValidLicense checks if the given string is a recognized SPDX identifier.
-func IsValidLicense(id string) bool {
-	return validLicenses[id]
 }

@@ -11,34 +11,44 @@ import (
 
 // Result holds the outcome of a check or fix operation.
 type Result struct {
-	// NonCompliant is the list of files that are missing or have incorrect headers.
 	NonCompliant []string
-	// Fixed is the list of files that were modified (fix mode only).
-	Fixed []string
-	// Skipped is the list of files that were skipped (generated, unsupported, etc.).
-	Skipped []string
-	// Errors maps file paths to errors encountered during processing.
-	Errors map[string]error
+	Fixed        []string
+	Skipped      []string
+	Errors       map[string]error
 }
 
 // Engine orchestrates license header checking and fixing.
 type Engine struct {
 	cfg     config.Config
 	scanner *scanner.Scanner
+	format  header.Format
 }
 
 // New creates an Engine from the given config.
-func New(cfg config.Config) *Engine {
-	// Determine root for gitignore — use first path or "."
+func New(cfg config.Config) (*Engine, error) {
 	root := "."
 	if len(cfg.Paths) > 0 {
 		root = cfg.Paths[0]
 	}
 
+	f, err := header.FormatByName(cfg.Format)
+	if err != nil {
+		return nil, err
+	}
+
+	// Load custom template if needed
+	if cfg.Format == "custom" {
+		cf := f.(*header.CustomFormat)
+		if err := cf.LoadTemplate(cfg.HeaderTemplate); err != nil {
+			return nil, err
+		}
+	}
+
 	return &Engine{
 		cfg:     cfg,
 		scanner: scanner.New(root, cfg.Exclude, cfg.ShouldUseGitignore()),
-	}
+		format:  f,
+	}, nil
 }
 
 // Check scans files and reports which ones are non-compliant.
@@ -68,7 +78,6 @@ func (e *Engine) run(fix, verbose bool) (*Result, error) {
 			continue
 		}
 
-		// Check for generated files
 		if e.cfg.ShouldSkipGenerated() {
 			gen, err := header.IsGenerated(path)
 			if err != nil {
@@ -84,7 +93,7 @@ func (e *Engine) run(fix, verbose bool) (*Result, error) {
 			}
 		}
 
-		valid, err := header.HasValid(path, style, e.cfg.CopyrightHolder, e.cfg.License)
+		valid, err := e.format.HasValid(path, style, e.cfg.CopyrightHolder, e.cfg.License)
 		if err != nil {
 			result.Errors[path] = err
 			continue
@@ -100,8 +109,8 @@ func (e *Engine) run(fix, verbose bool) (*Result, error) {
 		result.NonCompliant = append(result.NonCompliant, path)
 
 		if fix {
-			headerText := header.Generate(style, e.cfg.Year, e.cfg.CopyrightHolder, e.cfg.License)
-			if err := header.Prepend(path, style, headerText); err != nil {
+			headerText := e.format.Generate(style, e.cfg.Year, e.cfg.CopyrightHolder, e.cfg.License)
+			if err := header.Prepend(path, style, headerText, e.format); err != nil {
 				result.Errors[path] = err
 				continue
 			}
