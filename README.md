@@ -1,6 +1,6 @@
 # LicenseOps
 
-A fast CLI tool to check and fix SPDX license headers in source files. Built for CI pipelines, pre-commit hooks, and local development.
+A fast CLI tool to check, fix, and migrate license headers across 50+ languages. Supports SPDX, REUSE, Apache/GPL boilerplates, and custom templates. Built for CI pipelines, pre-commit hooks, and local development.
 
 ## Features
 
