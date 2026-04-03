@@ -1,7 +1,7 @@
 # Copyright 2026 Chalindu Kodikara
 # SPDX-License-Identifier: Apache-2.0
 
-FROM golang:1.24-alpine AS builder
+FROM golang:1.26-alpine AS builder
 
 WORKDIR /build
 

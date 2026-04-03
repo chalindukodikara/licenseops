@@ -40,7 +40,7 @@ jobs:
 ```yaml
       - uses: actions/setup-go@v5
         with:
-          go-version: '1.24'
+          go-version: '1.26'
 
       - name: Install licenseops
         run: go install github.com/chalindu/licenseops/cmd/licenseops@latest
@@ -126,7 +126,7 @@ jobs:
 
 ```yaml
 license-check:
-  image: golang:1.24-alpine
+  image: golang:1.26-alpine
   stage: lint
   script:
     - go install github.com/chalindu/licenseops/cmd/licenseops@latest
