@@ -1,4 +1,4 @@
-# Licenser
+# LicenseOps
 
 A fast CLI tool to check and fix SPDX license headers in source files. Built for CI pipelines, pre-commit hooks, and local development.
 
@@ -10,31 +10,31 @@ A fast CLI tool to check and fix SPDX license headers in source files. Built for
 - **SPDX expressions** — supports `AND`, `OR`, `WITH` operators (`Apache-2.0 OR MIT`)
 - **Smart handling** — preserves shebangs, Python encoding declarations, skips generated files and binaries
 - **Gitignore-aware** — respects `.gitignore` patterns automatically
-- **Config file + CLI flags** — commit `.licenser.yaml` to your repo, override with flags
+- **Config file + CLI flags** — commit `.licenseops.yaml` to your repo, override with flags
 - **Cross-format migration** — switch from one header format to another without manual cleanup
-- **Zero config viable** — works with just `licenser check -l MIT -o "Your Name" .`
+- **Zero config viable** — works with just `licenseops check -l MIT -o "Your Name" .`
 
 ## Installation
 
 ### Binary (recommended)
 
-Download from [Releases](https://github.com/chalindu/licenser/releases):
+Download from [Releases](https://github.com/chalindu/licenseops/releases):
 
 ```bash
-curl -sSL https://github.com/chalindu/licenser/releases/latest/download/licenser_Linux_x86_64.tar.gz | tar xz
-sudo mv licenser /usr/local/bin/
+curl -sSL https://github.com/chalindu/licenseops/releases/latest/download/licenser_Linux_x86_64.tar.gz | tar xz
+sudo mv licenseops /usr/local/bin/
 ```
 
 ### Go install
 
 ```bash
-go install github.com/chalindu/licenser/cmd/licenser@latest
+go install github.com/chalindu/licenseops/cmd/licenseops@latest
 ```
 
 ### Docker
 
 ```bash
-docker run --rm -v "$PWD":/src -w /src ghcr.io/chalindu/licenser check -l MIT -o "Your Name"
+docker run --rm -v "$PWD":/src -w /src ghcr.io/chalindu/licenseops check -l MIT -o "Your Name"
 ```
 
 ## Quick Start
@@ -42,18 +42,18 @@ docker run --rm -v "$PWD":/src -w /src ghcr.io/chalindu/licenser check -l MIT -o
 ### Check compliance
 
 ```bash
-licenser check -l Apache-2.0 -o "Acme Corp" .
+licenseops check -l Apache-2.0 -o "Acme Corp" .
 ```
 
 ### Fix headers
 
 ```bash
-licenser fix -l Apache-2.0 -o "Acme Corp" .
+licenseops fix -l Apache-2.0 -o "Acme Corp" .
 ```
 
 ### Use a config file
 
-Create `.licenser.yaml` in your project root:
+Create `.licenseops.yaml` in your project root:
 
 ```yaml
 license: Apache-2.0
@@ -66,8 +66,8 @@ exclude:
 Then simply run:
 
 ```bash
-licenser check
-licenser fix
+licenseops check
+licenseops fix
 ```
 
 ## Header Formats
@@ -124,7 +124,7 @@ Template variables: `{{.Year}}`, `{{.Holder}}`, `{{.License}}`, `{{.Comment}}`, 
 
 ## Configuration
 
-### `.licenser.yaml`
+### `.licenseops.yaml`
 
 ```yaml
 # Required
@@ -151,7 +151,7 @@ gitignore: true                # respect .gitignore patterns
 ### CLI Flags
 
 ```
--c, --config <path>       config file path (default: .licenser.yaml)
+-c, --config <path>       config file path (default: .licenseops.yaml)
 -l, --license <spdx-id>   SPDX license identifier or expression
 -o, --owner <holder>      copyright holder
 -y, --year <year>         copyright year
@@ -167,8 +167,8 @@ gitignore: true                # respect .gitignore patterns
 The `license` field supports full SPDX expressions:
 
 ```bash
-licenser check -l "Apache-2.0 OR MIT" -o "Acme Corp" .
-licenser check -l "GPL-3.0-only WITH Classpath-exception-2.0" -o "Acme Corp" .
+licenseops check -l "Apache-2.0 OR MIT" -o "Acme Corp" .
+licenseops check -l "GPL-3.0-only WITH Classpath-exception-2.0" -o "Acme Corp" .
 ```
 
 ## CI Integration
@@ -178,8 +178,8 @@ licenser check -l "GPL-3.0-only WITH Classpath-exception-2.0" -o "Acme Corp" .
 ```yaml
 - name: Check license headers
   run: |
-    curl -sSL https://github.com/chalindu/licenser/releases/latest/download/licenser_Linux_x86_64.tar.gz | tar xz
-    ./licenser check
+    curl -sSL https://github.com/chalindu/licenseops/releases/latest/download/licenser_Linux_x86_64.tar.gz | tar xz
+    ./licenseops check
 ```
 
 ### Exit Codes
@@ -194,10 +194,10 @@ licenser check -l "GPL-3.0-only WITH Classpath-exception-2.0" -o "Acme Corp" .
 
 ```yaml
 repos:
-  - repo: https://github.com/chalindu/licenser
+  - repo: https://github.com/chalindu/licenseops
     rev: v0.2.0
     hooks:
-      - id: licenser
+      - id: licenseops
         args: ["check"]
 ```
 

@@ -1,4 +1,4 @@
-module github.com/chalindu/licenser
+module github.com/chalindu/licenseops
 
 go 1.26.1
 

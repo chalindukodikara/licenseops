@@ -1,8 +1,11 @@
+# Copyright 2026 Chalindu Kodikara
+# SPDX-License-Identifier: Apache-2.0
+
 version: 2
 
 builds:
-  - main: ./cmd/licenser
-    binary: licenser
+  - main: ./cmd/licenseops
+    binary: licenseops
     env:
       - CGO_ENABLED=0
     ldflags:

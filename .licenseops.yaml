@@ -1,0 +1,10 @@
+license: Apache-2.0
+copyright-holder: "Chalindu Kodikara"
+format: spdx
+
+exclude:
+  - "vendor/**"
+  - "node_modules/**"
+  - "example/**"
+  - "dist/**"
+  - "docs/examples/**"

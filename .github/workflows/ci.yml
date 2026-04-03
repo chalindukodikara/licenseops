@@ -1,3 +1,6 @@
+# Copyright 2026 Chalindu Kodikara
+# SPDX-License-Identifier: Apache-2.0
+
 name: CI
 
 on:
@@ -20,7 +23,7 @@ jobs:
           go-version-file: go.mod
 
       - name: Build
-        run: go build ./cmd/licenser/
+        run: go build ./cmd/licenseops/
 
       - name: Vet
         run: go vet ./...
@@ -48,7 +51,7 @@ jobs:
       - uses: actions/checkout@v4
 
       - name: Build Docker image
-        run: docker build -t licenser:test .
+        run: docker build -t licenseops:test .
 
       - name: Test Docker image
-        run: docker run --rm licenser:test --version
+        run: docker run --rm licenseops:test --version

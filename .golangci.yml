@@ -1,0 +1,40 @@
+# Copyright 2026 Chalindu Kodikara
+# SPDX-License-Identifier: Apache-2.0
+
+version: "2"
+
+run:
+  timeout: 5m
+
+linters:
+  enable:
+    - errcheck
+    - govet
+    - ineffassign
+    - staticcheck
+    - unused
+    - gosimple
+    - gocritic
+    - gofmt
+    - misspell
+    - unconvert
+    - unparam
+
+  settings:
+    gocritic:
+      enabled-tags:
+        - diagnostic
+        - style
+      disabled-checks:
+        - hugeParam
+        - rangeValCopy
+
+    misspell:
+      locale: US
+
+  exclusions:
+    rules:
+      - path: _test\.go
+        linters:
+          - errcheck
+          - unparam
