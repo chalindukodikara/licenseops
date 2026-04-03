@@ -32,6 +32,8 @@ jobs:
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
 
+  # Docker images are pushed after the draft release is created.
+  # Publish the draft on GitHub to make the images available.
   docker:
     runs-on: ubuntu-latest
     needs: goreleaser
