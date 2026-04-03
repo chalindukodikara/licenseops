@@ -1,6 +1,8 @@
-# LicenseOps
+# LicenseOps (`lops`)
 
 A fast CLI tool to check, fix, and migrate license headers across 50+ languages. Supports SPDX, REUSE, Apache/GPL boilerplates, and custom templates. Built for CI pipelines, pre-commit hooks, and local development.
+
+> **Why "LicenseOps"?** — "License" says what it manages, "Ops" signals it's an operational tool built for automation — CI pipelines, pre-commit hooks, workflows. The CLI binary is `lops` (**L**icense**Ops**) — 4 characters, fast to type, same pattern as Kubernetes → `kubectl`, Terraform → `tf`.
 
 ## Features
 
@@ -12,7 +14,7 @@ A fast CLI tool to check, fix, and migrate license headers across 50+ languages.
 - **Gitignore-aware** — respects `.gitignore` patterns automatically
 - **Cross-format migration** — switch from one header format to another without manual cleanup
 - **CI-ready** — exit codes, `--dry-run`, Docker image, GitHub Actions compatible
-- **Zero config viable** — works with just `licenseops check -l MIT -o "Your Name" .`
+- **Zero config viable** — works with just `lops check -l MIT -o "Your Name" .`
 
 ## Installation
 
@@ -21,14 +23,14 @@ A fast CLI tool to check, fix, and migrate license headers across 50+ languages.
 Download from [Releases](https://github.com/chalindukodikara/licenseops/releases):
 
 ```bash
-curl -sSL https://github.com/chalindukodikara/licenseops/releases/latest/download/licenseops_Linux_x86_64.tar.gz | tar xz
-sudo mv licenseops /usr/local/bin/
+curl -sSL https://github.com/chalindukodikara/licenseops/releases/latest/download/lops_Linux_x86_64.tar.gz | tar xz
+sudo mv lops /usr/local/bin/
 ```
 
 ### Go install
 
 ```bash
-go install github.com/chalindukodikara/licenseops/cmd/licenseops@latest
+go install github.com/chalindukodikara/licenseops/cmd/lops@latest
 ```
 
 ### Docker
@@ -42,13 +44,13 @@ docker run --rm -v "$PWD":/src -w /src ghcr.io/chalindukodikara/licenseops check
 **Check** compliance:
 
 ```bash
-licenseops check -l Apache-2.0 -o "Acme Corp" .
+lops check -l Apache-2.0 -o "Acme Corp" .
 ```
 
 **Fix** headers:
 
 ```bash
-licenseops fix -l Apache-2.0 -o "Acme Corp" .
+lops fix -l Apache-2.0 -o "Acme Corp" .
 ```
 
 **Config file** — create `.licenseops.yaml` in your project root:
@@ -64,8 +66,8 @@ exclude:
 Then simply:
 
 ```bash
-licenseops check
-licenseops fix
+lops check
+lops fix
 ```
 
 ## Header Formats
@@ -120,8 +122,8 @@ Precedence: **CLI flags > config file > defaults**
 ### SPDX Expressions
 
 ```bash
-licenseops check -l "Apache-2.0 OR MIT" -o "Acme Corp" .
-licenseops check -l "GPL-3.0-only WITH Classpath-exception-2.0" -o "Acme Corp" .
+lops check -l "Apache-2.0 OR MIT" -o "Acme Corp" .
+lops check -l "GPL-3.0-only WITH Classpath-exception-2.0" -o "Acme Corp" .
 ```
 
 ## CI Integration
@@ -131,8 +133,8 @@ licenseops check -l "GPL-3.0-only WITH Classpath-exception-2.0" -o "Acme Corp" .
 ```yaml
 - name: Check license headers
   run: |
-    curl -sSL https://github.com/chalindukodikara/licenseops/releases/latest/download/licenseops_Linux_x86_64.tar.gz | tar xz
-    ./licenseops check
+    curl -sSL https://github.com/chalindukodikara/licenseops/releases/latest/download/lops_Linux_x86_64.tar.gz | tar xz
+    ./lops check
 ```
 
 ### Exit Codes

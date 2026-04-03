@@ -4,7 +4,7 @@ LicenseOps can be configured via a YAML config file, CLI flags, or a combination
 
 ## Config File
 
-By default, licenseops looks for `.licenseops.yaml` in the current directory. Use `-c` to specify a different path.
+By default, lops looks for `.licenseops.yaml` in the current directory. Use `-c` to specify a different path.
 
 ### Minimal Config
 

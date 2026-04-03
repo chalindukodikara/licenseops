@@ -10,10 +10,10 @@ RUN go mod download
 
 COPY . .
 
-RUN CGO_ENABLED=0 go build -ldflags="-s -w" -o /licenseops ./cmd/licenseops/
+RUN CGO_ENABLED=0 go build -ldflags="-s -w" -o /lops ./cmd/lops/
 
 FROM alpine:3.21
 
-COPY --from=builder /licenseops /usr/local/bin/licenseops
+COPY --from=builder /lops /usr/local/bin/lops
 
-ENTRYPOINT ["licenseops"]
+ENTRYPOINT ["lops"]

@@ -1,8 +1,8 @@
 # Copyright 2026 Chalindu Kodikara
 # SPDX-License-Identifier: Apache-2.0
 
-BINARY := licenseops
-CMD := ./cmd/licenseops
+BINARY := lops
+CMD := ./cmd/lops
 MODULE := github.com/chalindukodikara/licenseops
 VERSION ?= dev
 LDFLAGS := -ldflags "-s -w -X main.version=$(VERSION)"
@@ -46,17 +46,17 @@ tidy: ## Tidy go.mod
 ## LicenseOps (self-check)
 
 check: build ## Check license headers in this repo
-	./$(BINARY) check -l Apache-2.0 -o "LicenseOps Authors" .
+	./$(BINARY) check
 
 fix: build ## Fix license headers in this repo
-	./$(BINARY) fix -l Apache-2.0 -o "LicenseOps Authors" .
+	./$(BINARY) fix
 
 ## Docker
 
 docker: ## Build Docker image
 	docker build -t $(BINARY):latest .
 
-docker-run: docker ## Run licenseops in Docker (mount current dir)
+docker-run: docker ## Run lops in Docker (mount current dir)
 	docker run --rm -v "$$(pwd)":/src -w /src $(BINARY):latest check -v .
 
 ## Release

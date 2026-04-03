@@ -86,10 +86,10 @@ Releases are cut from a **release branch** and triggered by pushing a Git tag.
 ### What Gets Created
 
 **GitHub Release (draft)** — via GoReleaser:
-- `licenseops_Linux_x86_64.tar.gz`
-- `licenseops_Linux_arm64.tar.gz`
-- `licenseops_Darwin_x86_64.tar.gz`
-- `licenseops_Darwin_arm64.tar.gz`
+- `lops_Linux_x86_64.tar.gz`
+- `lops_Linux_arm64.tar.gz`
+- `lops_Darwin_x86_64.tar.gz`
+- `lops_Darwin_arm64.tar.gz`
 - `checksums.txt`
 - Auto-generated changelog grouped by type:
   - **Features** — commits starting with `feat:`
@@ -143,7 +143,7 @@ Before tagging a release:
 - [ ] All CI checks pass on `main`
 - [ ] `make lint` passes locally
 - [ ] `make test` passes locally
-- [ ] `licenseops check` passes on the repo itself
+- [ ] `lops check` passes on the repo itself
 - [ ] Update version references in docs if needed
 - [ ] Verify `RELEASE.md` changelog is up to date
 

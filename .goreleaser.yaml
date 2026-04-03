@@ -4,8 +4,8 @@
 version: 2
 
 builds:
-  - main: ./cmd/licenseops
-    binary: licenseops
+  - main: ./cmd/lops
+    binary: lops
     env:
       - CGO_ENABLED=0
     ldflags:

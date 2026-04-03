@@ -27,7 +27,7 @@ var (
 
 func main() {
 	rootCmd := &cobra.Command{
-		Use:   "licenseops",
+		Use:   "lops",
 		Short: "Enforce SPDX license headers in source files",
 		Long: `LicenseOps is a CLI tool to check and fix license headers in source files.
 
@@ -38,7 +38,7 @@ Supported formats:
   gpl-long     GNU GPL/LGPL/AGPL boilerplate
   custom       User-defined template
 
-Use 'licenseops check' to validate compliance and 'licenseops fix' to add or
+Use 'lops check' to validate compliance and 'lops fix' to add or
 replace headers automatically. Configuration is read from .licenseops.yaml
 or provided via CLI flags.`,
 		Version: version,

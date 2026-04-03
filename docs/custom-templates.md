@@ -107,7 +107,7 @@ package main
 
 ## How Check Works with Custom Templates
 
-When running `licenseops check` with a custom template:
+When running `lops check` with a custom template:
 
 1. The template is rendered with `{{.Year}}` replaced by a wildcard pattern (`\d{4}`)
 2. The rendered text is converted to a regex
@@ -120,7 +120,7 @@ This means:
 
 ## How Fix Works with Custom Templates
 
-When running `licenseops fix`:
+When running `lops fix`:
 
 1. Any existing header (in any known format) is stripped first
 2. The template is rendered with the configured values

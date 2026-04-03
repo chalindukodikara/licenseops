@@ -1,6 +1,6 @@
 # Use Cases
 
-Real-world scenarios and how to set up licenseops for each.
+Real-world scenarios and how to set up lops for each.
 
 ---
 
@@ -22,10 +22,10 @@ exclude:
 **Usage:**
 ```bash
 # Check in CI
-licenseops check
+lops check
 
 # Fix locally before committing
-licenseops fix
+lops fix
 ```
 
 **Result:**
@@ -310,7 +310,7 @@ package main
 
 **Command:**
 ```bash
-licenseops fix -l Apache-2.0 -o "New Corp" -f spdx .
+lops fix -l Apache-2.0 -o "New Corp" -f spdx .
 ```
 
 **After:**
@@ -327,7 +327,7 @@ LicenseOps detects the old format and fully replaces it with the new one — no 
 
 ## 11. Multi-Language Project
 
-A project with Go, Python, Shell, SQL, and CSS files. No special config needed — licenseops auto-detects the correct comment style for each file type.
+A project with Go, Python, Shell, SQL, and CSS files. No special config needed — lops auto-detects the correct comment style for each file type.
 
 **.licenseops.yaml:**
 ```yaml
@@ -361,14 +361,14 @@ For simple projects or one-off checks, use CLI flags only — no config file nee
 
 ```bash
 # Check
-licenseops check -l MIT -o "My Name" .
+lops check -l MIT -o "My Name" .
 
 # Fix
-licenseops fix -l MIT -o "My Name" .
+lops fix -l MIT -o "My Name" .
 
 # Check with verbose output
-licenseops check -l MIT -o "My Name" -v .
+lops check -l MIT -o "My Name" -v .
 
 # Preview what fix would change
-licenseops fix -l MIT -o "My Name" --dry-run .
+lops fix -l MIT -o "My Name" --dry-run .
 ```

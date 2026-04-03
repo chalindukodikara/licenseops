@@ -138,7 +138,7 @@ LicenseOps handles format migration automatically. When you run `fix` with a dif
 ```bash
 # Files currently have apache-long headers
 # Migrate to SPDX short:
-licenseops fix -f spdx -l Apache-2.0 -o "Acme Corp" .
+lops fix -f spdx -l Apache-2.0 -o "Acme Corp" .
 ```
 
 No manual cleanup needed — the old boilerplate is fully removed and replaced.

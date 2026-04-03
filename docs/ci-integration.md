@@ -1,6 +1,6 @@
 # CI Integration Guide
 
-How to integrate licenseops into your CI/CD pipelines.
+How to integrate lops into your CI/CD pipelines.
 
 ## Exit Codes
 
@@ -26,13 +26,13 @@ jobs:
     steps:
       - uses: actions/checkout@v4
 
-      - name: Install licenseops
+      - name: Install lops
         run: |
           curl -sSL https://github.com/chalindukodikara/licenseops/releases/latest/download/licenser_Linux_x86_64.tar.gz | tar xz
-          sudo mv licenseops /usr/local/bin/
+          sudo mv lops /usr/local/bin/
 
       - name: Check license headers
-        run: licenseops check
+        run: lops check
 ```
 
 ### With Go Install
@@ -42,11 +42,11 @@ jobs:
         with:
           go-version: '1.26'
 
-      - name: Install licenseops
-        run: go install github.com/chalindukodikara/licenseops/cmd/licenseops@latest
+      - name: Install lops
+        run: go install github.com/chalindukodikara/licenseops/cmd/lops@latest
 
       - name: Check license headers
-        run: licenseops check
+        run: lops check
 ```
 
 ### With Docker
@@ -77,13 +77,13 @@ jobs:
         with:
           ref: ${{ github.head_ref }}
 
-      - name: Install licenseops
+      - name: Install lops
         run: |
           curl -sSL https://github.com/chalindukodikara/licenseops/releases/latest/download/licenser_Linux_x86_64.tar.gz | tar xz
-          sudo mv licenseops /usr/local/bin/
+          sudo mv lops /usr/local/bin/
 
       - name: Fix license headers
-        run: licenseops fix
+        run: lops fix
 
       - name: Commit changes
         uses: stefanzweifel/git-auto-commit-action@v5
@@ -107,11 +107,11 @@ jobs:
         with:
           go-version-file: go.mod
 
-      - name: Install licenseops
-        run: go install github.com/chalindukodikara/licenseops/cmd/licenseops@latest
+      - name: Install lops
+        run: go install github.com/chalindukodikara/licenseops/cmd/lops@latest
 
       - name: License headers
-        run: licenseops check
+        run: lops check
 
       - name: Lint
         uses: golangci/golangci-lint-action@v6
@@ -129,8 +129,8 @@ license-check:
   image: golang:1.26-alpine
   stage: lint
   script:
-    - go install github.com/chalindukodikara/licenseops/cmd/licenseops@latest
-    - licenseops check
+    - go install github.com/chalindukodikara/licenseops/cmd/lops@latest
+    - lops check
   rules:
     - if: $CI_MERGE_REQUEST_ID
 ```
@@ -148,11 +148,11 @@ repos:
   - repo: https://github.com/chalindukodikara/licenseops
     rev: v0.1.0
     hooks:
-      - id: licenseops-check
+      - id: lops-check
         name: Check license headers
-        entry: licenseops check
+        entry: lops check
         language: golang
-        additional_dependencies: ["github.com/chalindukodikara/licenseops/cmd/licenseops@v0.1.0"]
+        additional_dependencies: ["github.com/chalindukodikara/licenseops/cmd/lops@v0.1.0"]
         always_run: true
         pass_filenames: false
 ```
@@ -164,11 +164,11 @@ repos:
   - repo: https://github.com/chalindukodikara/licenseops
     rev: v0.1.0
     hooks:
-      - id: licenseops-fix
+      - id: lops-fix
         name: Fix license headers
-        entry: licenseops fix
+        entry: lops fix
         language: golang
-        additional_dependencies: ["github.com/chalindukodikara/licenseops/cmd/licenseops@v0.1.0"]
+        additional_dependencies: ["github.com/chalindukodikara/licenseops/cmd/lops@v0.1.0"]
         always_run: true
         pass_filenames: false
 ```
@@ -183,10 +183,10 @@ Add these targets to your project's Makefile:
 .PHONY: license-check license-fix
 
 license-check: ## Check license headers
-	licenseops check
+	lops check
 
 license-fix: ## Fix license headers
-	licenseops fix
+	lops fix
 ```
 
 Then use in CI:
@@ -233,5 +233,5 @@ docker run --rm -v "$(pwd)":/src -w /src ghcr.io/chalindukodikara/licenseops che
 
 - **Fail fast**: Put the license check early in your pipeline — it's fast and catches common issues.
 - **Config in repo**: Commit `.licenseops.yaml` so CI and local dev use the same settings.
-- **Dry run first**: Use `licenseops fix --dry-run` in CI to report what would change without modifying files.
+- **Dry run first**: Use `lops fix --dry-run` in CI to report what would change without modifying files.
 - **Verbose in CI**: Use `-v` to see every file in CI logs for debugging.
