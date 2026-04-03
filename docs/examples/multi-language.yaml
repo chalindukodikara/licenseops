@@ -1,0 +1,11 @@
+# Example: Multi-language project (Go + Python + JS + SQL + CSS)
+# No special config needed — licenser auto-detects comment styles
+license: Apache-2.0
+copyright-holder: "DevTeam"
+
+exclude:
+  - "vendor/**"
+  - "node_modules/**"
+  - "**/dist/**"
+  - "**/*.min.*"
+  - "**/__pycache__/**"

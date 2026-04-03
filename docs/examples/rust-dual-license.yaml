@@ -1,0 +1,6 @@
+# Example: Rust project with dual Apache-2.0/MIT license
+license: "Apache-2.0 OR MIT"
+copyright-holder: "The Rust Project Contributors"
+
+exclude:
+  - "target/**"

@@ -1,0 +1,3 @@
+# Example: SPDX 1-line mode (no copyright line)
+# Omit copyright-holder to get single-line SPDX headers
+license: GPL-2.0-only

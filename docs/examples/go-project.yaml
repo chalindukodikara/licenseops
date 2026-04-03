@@ -1,0 +1,9 @@
+# Example: Go project with Apache-2.0 license
+license: Apache-2.0
+copyright-holder: "The MyProject Authors"
+
+exclude:
+  - "vendor/**"
+  - "**/*.pb.go"
+  - "**/zz_generated.*"
+  - "**/testdata/**"

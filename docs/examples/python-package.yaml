@@ -1,0 +1,11 @@
+# Example: Python package with BSD-3-Clause license
+license: BSD-3-Clause
+copyright-holder: "University Research Lab"
+
+exclude:
+  - "**/__pycache__/**"
+  - "*.egg-info/**"
+  - "venv/**"
+  - ".venv/**"
+  - ".tox/**"
+  - "**/*.pyc"

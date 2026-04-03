@@ -1,0 +1,8 @@
+# Example: Apache Foundation style with full boilerplate
+license: Apache-2.0
+copyright-holder: "The Apache Software Foundation"
+format: apache-long
+
+exclude:
+  - "vendor/**"
+  - "**/*.pb.go"

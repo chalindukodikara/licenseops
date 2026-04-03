@@ -1,0 +1,4 @@
+# Example: FSFE REUSE compliant project
+license: GPL-3.0-or-later
+copyright-holder: "Jane Doe <jane@example.com>"
+format: reuse
