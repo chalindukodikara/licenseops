@@ -85,15 +85,15 @@ func ValidateExpression(expr string) (warnings []string, err error) {
 		// Handle the + suffix (e.g. EPL-1.0+)
 		id := strings.TrimSuffix(token, "+")
 
-		// Check for deprecated GNU IDs
-		if suggestion, ok := DeprecatedGNU[id]; ok {
+		// Check for deprecated GNU IDs (case-insensitive)
+		if suggestion, ok := findDeprecated(id); ok {
 			warnings = append(warnings,
 				fmt.Sprintf("deprecated SPDX ID %q — use %s instead", id, suggestion))
 			continue // still valid, just deprecated
 		}
 
 		if !ValidLicenses[id] {
-			return warnings, fmt.Errorf("unknown SPDX license identifier: %q\n  valid IDs: %s", id, strings.Join(ValidLicenseList(), ", "))
+			return warnings, unknownLicenseError(id)
 		}
 	}
 
@@ -109,12 +109,13 @@ func ValidateLicense(license string) (warnings []string, err error) {
 	// Single ID
 	id := strings.TrimSuffix(license, "+")
 
-	if suggestion, ok := DeprecatedGNU[id]; ok {
+	// Check for deprecated GNU IDs (case-insensitive)
+	if suggestion, ok := findDeprecated(id); ok {
 		return []string{fmt.Sprintf("deprecated SPDX ID %q — use %s instead", id, suggestion)}, nil
 	}
 
 	if !ValidLicenses[id] {
-		return nil, fmt.Errorf("unknown SPDX license identifier: %q\n  valid IDs: %s", id, strings.Join(ValidLicenseList(), ", "))
+		return nil, unknownLicenseError(id)
 	}
 
 	return nil, nil
@@ -139,6 +140,83 @@ func ValidLicenseList() []string {
 	}
 	sort.Strings(ids)
 	return ids
+}
+
+// findDeprecated does a case-insensitive lookup in DeprecatedGNU.
+func findDeprecated(id string) (suggestion string, ok bool) {
+	if s, found := DeprecatedGNU[id]; found {
+		return s, true
+	}
+	lower := strings.ToLower(id)
+	for dep, s := range DeprecatedGNU {
+		if strings.ToLower(dep) == lower {
+			return s, true
+		}
+	}
+	return "", false
+}
+
+// SuggestLicense returns valid license IDs similar to the input,
+// using case-insensitive exact, prefix, and substring matching.
+func SuggestLicense(input string) []string {
+	lower := strings.ToLower(input)
+	var exact, prefix, contains []string
+
+	for id := range ValidLicenses {
+		idLower := strings.ToLower(id)
+		switch {
+		case idLower == lower:
+			exact = append(exact, id)
+		case strings.HasPrefix(idLower, lower):
+			prefix = append(prefix, id)
+		case strings.Contains(idLower, lower):
+			contains = append(contains, id)
+		}
+	}
+
+	if len(exact) > 0 {
+		sort.Strings(exact)
+		return exact
+	}
+	if len(prefix) > 0 {
+		sort.Strings(prefix)
+		return prefix
+	}
+	if len(contains) > 0 {
+		sort.Strings(contains)
+		return contains
+	}
+	return nil
+}
+
+// unknownLicenseError builds an error for an unrecognized license ID,
+// showing "did you mean?" suggestions when possible.
+func unknownLicenseError(id string) error {
+	if suggestions := SuggestLicense(id); len(suggestions) > 0 {
+		return fmt.Errorf("unknown SPDX license identifier: %q\n  did you mean: %s", id, strings.Join(suggestions, ", "))
+	}
+	return fmt.Errorf("unknown SPDX license identifier: %q\n  valid IDs: %s", id, formatIDList(ValidLicenseList()))
+}
+
+// formatIDList formats a list of IDs with line wrapping for readability.
+func formatIDList(ids []string) string {
+	const maxLen = 68
+	var b strings.Builder
+	lineLen := 0
+	for i, id := range ids {
+		if i > 0 {
+			if lineLen+2+len(id) > maxLen {
+				b.WriteString(",\n    ")
+				lineLen = 4
+			} else {
+				b.WriteString(", ")
+				lineLen += 2
+			}
+		}
+		b.WriteString(id)
+		lineLen += len(id)
+	}
+	return b.String()
 }
 
 // tokenize splits an SPDX expression into tokens.
