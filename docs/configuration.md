@@ -4,7 +4,20 @@ LicenseOps can be configured via a YAML config file, CLI flags, or a combination
 
 ## Config File
 
-By default, lops looks for `.licenseops.yaml` in the current directory. Use `-c` to specify a different path.
+By default, `lops` looks for `.licenseops.yaml` in the current working directory. Use `-c` to specify a different path.
+
+### Config File Resolution
+
+| Scenario | Behavior |
+|----------|----------|
+| `.licenseops.yaml` exists in cwd | Loaded automatically — no flags needed |
+| `.licenseops.yaml` doesn't exist | Silently falls back to built-in defaults, no error |
+| `-c path/to/config.yaml` | Uses that file — errors if not found |
+| `-c /dev/null` | Empty config — only CLI flags and defaults apply |
+
+This means `lops` works in two modes:
+- **With config**: commit `.licenseops.yaml` to your repo, run `lops check` / `lops fix` with no flags
+- **Without config**: pass everything via flags — `lops check -l MIT -o "Your Name" .`
 
 ### Minimal Config
 
@@ -45,23 +58,92 @@ gitignore: true                # respect .gitignore patterns
 
 ## CLI Flags
 
-| Flag | Short | Description | Example |
-|------|-------|-------------|---------|
-| `--license` | `-l` | SPDX license ID or expression | `-l MIT`, `-l "Apache-2.0 OR MIT"` |
-| `--owner` | `-o` | Copyright holder | `-o "Acme Corp"` |
-| `--format` | `-f` | Header format | `-f reuse` |
-| `--year` | `-y` | Copyright year | `-y 2025` |
-| `--config` | `-c` | Config file path | `-c .licenseops.yaml` |
-| `--verbose` | `-v` | Show every file | `-v` |
-| `--dry-run` | | Preview changes (fix only) | `--dry-run` |
+| Flag | Short | Default | Description |
+|------|-------|---------|-------------|
+| `--license` | `-l` | *none* | SPDX license ID or expression |
+| `--owner` | `-o` | *none* | Copyright holder |
+| `--format` | `-f` | `spdx` | Header format |
+| `--year` | `-y` | Current year | Copyright year |
+| `--config` | `-c` | `.licenseops.yaml` | Config file path |
+| `--verbose` | `-v` | `false` | Show every file |
+| `--dry-run` | | `false` | Preview changes (fix only) |
 
-### Precedence
+No flag is required on the command line — all values can be provided via the config file instead. The tool validates that required **values** are present (from either source) before running.
+
+### Defaults and Fallbacks
+
+Every setting is resolved through a three-layer chain:
 
 ```
-CLI flags  >  config file  >  defaults
+CLI flag  →  config file  →  built-in default
 ```
 
-If both a config file and CLI flags are provided, flags override config values.
+If a CLI flag is set, it wins. Otherwise the config file value is used. If neither provides a value, the built-in default applies. If there is no default and no value is provided, validation errors with a clear message.
+
+**Detailed default values:**
+
+| Setting | Built-in Default | Notes |
+|---------|-----------------|-------|
+| `license` | *none* — required | Must be set via config or `-l` flag. Errors if missing. |
+| `copyright-holder` | *none* — optional | If omitted, SPDX format uses 1-line mode (no copyright line). Required for `reuse`, `apache-long`, `gpl-long` formats. |
+| `format` | `spdx` | Can be overridden in config or with `-f` flag. |
+| `year` | Current year (e.g. `2026`) | Auto-detected. Override with `-y` for a specific year. |
+| `config` | `.licenseops.yaml` | Looked up in cwd. If the file doesn't exist, silently skipped — no error. |
+| `paths` | `["."]` | Scans current directory. Config can set multiple paths. CLI args override entirely. |
+| `exclude` | `vendor/**`, `node_modules/**`, `.git/**`, `third_party/**`, `.licenseops.yaml` | Config patterns are **appended** to these defaults, not replaced. |
+| `skip-generated` | `true` | Skips files with `DO NOT EDIT` / `@generated` markers. |
+| `gitignore` | `true` | Respects `.gitignore` patterns from the project root. |
+| `header-template` | *none* | Only required when `format: custom`. |
+
+### Required vs Optional by Format
+
+| Setting | `spdx` | `reuse` | `apache-long` | `gpl-long` | `custom` |
+|---------|--------|---------|---------------|------------|----------|
+| `license` | Required | Required | Must be `Apache-2.0` | Must be GPL/LGPL/AGPL | Required |
+| `copyright-holder` | Optional (omit for 1-line) | Required | Required | Required | Optional |
+| `header-template` | — | — | — | — | Required |
+
+If a required field is missing, `lops` exits with code 2 and a message like:
+
+```
+Error: license is required (set via config or --license flag)
+Error: copyright-holder is required for 'reuse' format
+Error: 'apache-long' format requires license: Apache-2.0 (got "MIT")
+```
+
+### Flag Behavior Details
+
+**`-o ""` (explicit empty owner):** Clears the copyright holder even if the config file sets one. This forces SPDX 1-line mode.
+
+```bash
+# Config has copyright-holder, but you want 1-line mode for this run:
+lops fix -l MIT -o "" .
+```
+
+**`-l` (license):** Accepts single IDs (`MIT`) or expressions (`Apache-2.0 OR MIT`). Validated against the SPDX license list. Deprecated GNU IDs (`GPL-2.0`) trigger a warning but still work.
+
+**Paths (positional args):** If paths are passed as arguments, they **replace** the `paths` from config entirely (not appended).
+
+```bash
+# Config says paths: ["."], but only scan src/:
+lops check src/
+
+# Scan multiple specific paths:
+lops check src/ libs/ cmd/
+```
+
+### Merge Rules Summary
+
+| Setting | Merge behavior |
+|---------|---------------|
+| `license` | Flag replaces config |
+| `copyright-holder` | Flag replaces config (including `-o ""` to clear) |
+| `format` | Flag replaces config |
+| `year` | Flag replaces config |
+| `paths` | CLI args **replace** config (not appended) |
+| `exclude` | Config **appends** to built-in defaults (not replaced) |
+| `skip-generated` | Config replaces default |
+| `gitignore` | Config replaces default |
 
 ## Exclude Patterns
 

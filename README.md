@@ -85,6 +85,8 @@ See [docs/formats.md](docs/formats.md) for side-by-side comparison.
 
 ## Configuration
 
+`lops` automatically looks for `.licenseops.yaml` in the current directory. If not found, it silently uses built-in defaults — no error. You can always override with CLI flags, or skip the config file entirely.
+
 ### `.licenseops.yaml`
 
 ```yaml

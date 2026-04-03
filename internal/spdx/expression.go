@@ -5,6 +5,7 @@ package spdx
 
 import (
 	"fmt"
+	"sort"
 	"strings"
 )
 
@@ -92,7 +93,7 @@ func ValidateExpression(expr string) (warnings []string, err error) {
 		}
 
 		if !ValidLicenses[id] {
-			return warnings, fmt.Errorf("unknown SPDX license identifier: %q", id)
+			return warnings, fmt.Errorf("unknown SPDX license identifier: %q\n  valid IDs: %s", id, strings.Join(ValidLicenseList(), ", "))
 		}
 	}
 
@@ -113,7 +114,7 @@ func ValidateLicense(license string) (warnings []string, err error) {
 	}
 
 	if !ValidLicenses[id] {
-		return nil, fmt.Errorf("unknown SPDX license identifier: %q", id)
+		return nil, fmt.Errorf("unknown SPDX license identifier: %q\n  valid IDs: %s", id, strings.Join(ValidLicenseList(), ", "))
 	}
 
 	return nil, nil
@@ -128,6 +129,16 @@ func IsGPLFamily(license string) bool {
 	return strings.HasPrefix(id, "GPL-") ||
 		strings.HasPrefix(id, "LGPL-") ||
 		strings.HasPrefix(id, "AGPL-")
+}
+
+// ValidLicenseList returns a sorted list of all valid SPDX identifiers.
+func ValidLicenseList() []string {
+	ids := make([]string, 0, len(ValidLicenses))
+	for id := range ValidLicenses {
+		ids = append(ids, id)
+	}
+	sort.Strings(ids)
+	return ids
 }
 
 // tokenize splits an SPDX expression into tokens.

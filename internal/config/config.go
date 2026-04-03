@@ -127,7 +127,7 @@ func (c *Config) Validate() (warnings []string, err error) {
 			return warnings, fmt.Errorf("copyright-holder is required for 'gpl-long' format")
 		}
 		if !spdx.IsGPLFamily(c.License) {
-			return warnings, fmt.Errorf("'gpl-long' format requires a GPL/LGPL/AGPL license (got %q)", c.License)
+			return warnings, fmt.Errorf("'gpl-long' format requires a GPL/LGPL/AGPL license (got %q)\n  valid: GPL-2.0-only, GPL-2.0-or-later, GPL-3.0-only, GPL-3.0-or-later,\n         LGPL-2.1-only, LGPL-2.1-or-later, LGPL-3.0-only, LGPL-3.0-or-later,\n         AGPL-3.0-only, AGPL-3.0-or-later", c.License)
 		}
 	case "custom":
 		if c.HeaderTemplate == "" {

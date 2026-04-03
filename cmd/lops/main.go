@@ -62,7 +62,7 @@ or provided via CLI flags.`,
 	}
 }
 
-func loadConfig(args []string) (config.Config, error) {
+func loadConfig(cmd *cobra.Command, args []string) (config.Config, error) {
 	cfg, err := config.Load(flagConfig)
 	if err != nil {
 		return cfg, err
@@ -71,7 +71,8 @@ func loadConfig(args []string) (config.Config, error) {
 	if flagLicense != "" {
 		cfg.License = flagLicense
 	}
-	if flagOwner != "" {
+	// Allow explicit -o "" to clear copyright-holder (enables SPDX 1-line mode)
+	if cmd.Flags().Changed("owner") {
 		cfg.CopyrightHolder = flagOwner
 	}
 	if flagYear != "" {
@@ -109,7 +110,7 @@ func checkCmd() *cobra.Command {
 Exits with code 0 if all files are compliant, code 1 if any files are
 missing or have incorrect headers, and code 2 on runtime errors.`,
 		RunE: func(cmd *cobra.Command, args []string) error {
-			cfg, err := loadConfig(args)
+			cfg, err := loadConfig(cmd, args)
 			if err != nil {
 				return err
 			}
@@ -153,7 +154,7 @@ incorrect or missing headers will have the correct header added or replaced.
 
 Use --dry-run to see what would change without modifying files.`,
 		RunE: func(cmd *cobra.Command, args []string) error {
-			cfg, err := loadConfig(args)
+			cfg, err := loadConfig(cmd, args)
 			if err != nil {
 				return err
 			}
