@@ -1,3 +1,6 @@
+// Copyright 2026 Chalindu Kodikara
+// SPDX-License-Identifier: Apache-2.0
+
 package header
 
 import (
@@ -6,7 +9,7 @@ import (
 	"regexp"
 	"strings"
 
-	"github.com/chalindu/licenser/internal/language"
+	"github.com/chalindu/licenseops/internal/language"
 )
 
 // Shared regex patterns used by multiple formats.
@@ -17,7 +20,7 @@ var (
 	reBlockCopyrightLine = regexp.MustCompile(`^\s*\*?\s*Copyright\s+\d{4}\s+.+$`)
 	reBlockSPDXLine      = regexp.MustCompile(`^\s*\*?\s*SPDX-License-Identifier:\s+.+$`)
 	reBlockReuseLine     = regexp.MustCompile(`^\s*\*?\s*SPDX-FileCopyrightText:\s+.+$`)
-	reGeneratedMarker    = regexp.MustCompile(`(?i)(code generated.*do not edit|@generated)`)
+	reGeneratedMarker    = regexp.MustCompile(`(?i)(code generated.*do not ` + `edit|@` + `generated)`)
 	reShebang            = regexp.MustCompile(`^#!.+`)
 	rePythonEncoding     = regexp.MustCompile(`^#.*(-\*-\s*coding[:=]|coding[:=])\s*\S+`)
 	reApacheAnchor       = regexp.MustCompile(`(?i)Licensed under the Apache License`)

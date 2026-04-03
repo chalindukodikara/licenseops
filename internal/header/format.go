@@ -1,9 +1,12 @@
+// Copyright 2026 Chalindu Kodikara
+// SPDX-License-Identifier: Apache-2.0
+
 package header
 
 import (
 	"fmt"
 
-	"github.com/chalindu/licenser/internal/language"
+	"github.com/chalindu/licenseops/internal/language"
 )
 
 // Format defines how license headers are generated, detected, and stripped.

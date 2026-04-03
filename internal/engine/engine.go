@@ -1,12 +1,15 @@
+// Copyright 2026 Chalindu Kodikara
+// SPDX-License-Identifier: Apache-2.0
+
 package engine
 
 import (
 	"fmt"
 
-	"github.com/chalindu/licenser/internal/config"
-	"github.com/chalindu/licenser/internal/header"
-	"github.com/chalindu/licenser/internal/language"
-	"github.com/chalindu/licenser/internal/scanner"
+	"github.com/chalindu/licenseops/internal/config"
+	"github.com/chalindu/licenseops/internal/header"
+	"github.com/chalindu/licenseops/internal/language"
+	"github.com/chalindu/licenseops/internal/scanner"
 )
 
 // Result holds the outcome of a check or fix operation.

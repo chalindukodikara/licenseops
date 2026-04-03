@@ -1,3 +1,6 @@
+// Copyright 2026 Chalindu Kodikara
+// SPDX-License-Identifier: Apache-2.0
+
 package scanner
 
 import (
@@ -8,7 +11,7 @@ import (
 	"github.com/bmatcuk/doublestar/v4"
 	ignore "github.com/sabhiram/go-gitignore"
 
-	"github.com/chalindu/licenser/internal/language"
+	"github.com/chalindu/licenseops/internal/language"
 )
 
 // Scanner walks directories and yields files that should be processed.

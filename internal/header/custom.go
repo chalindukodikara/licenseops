@@ -1,3 +1,6 @@
+// Copyright 2026 Chalindu Kodikara
+// SPDX-License-Identifier: Apache-2.0
+
 package header
 
 import (
@@ -8,7 +11,7 @@ import (
 	"strings"
 	"text/template"
 
-	"github.com/chalindu/licenser/internal/language"
+	"github.com/chalindu/licenseops/internal/language"
 )
 
 // CustomFormat implements a user-defined header template format.

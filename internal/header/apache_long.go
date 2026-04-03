@@ -1,10 +1,13 @@
+// Copyright 2026 Chalindu Kodikara
+// SPDX-License-Identifier: Apache-2.0
+
 package header
 
 import (
 	"fmt"
 	"strings"
 
-	"github.com/chalindu/licenser/internal/language"
+	"github.com/chalindu/licenseops/internal/language"
 )
 
 // ApacheLongFormat implements the Apache License 2.0 long-form boilerplate header.

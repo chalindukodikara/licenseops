@@ -1,3 +1,6 @@
+// Copyright 2026 Chalindu Kodikara
+// SPDX-License-Identifier: Apache-2.0
+
 package config
 
 import (
@@ -5,7 +8,7 @@ import (
 	"os"
 	"time"
 
-	"github.com/chalindu/licenser/internal/spdx"
+	"github.com/chalindu/licenseops/internal/spdx"
 	"gopkg.in/yaml.v3"
 )
 
@@ -36,7 +39,7 @@ func Defaults() Config {
 			"node_modules/**",
 			".git/**",
 			"third_party/**",
-			".licenser.yaml",
+			".licenseops.yaml",
 		},
 	}
 }

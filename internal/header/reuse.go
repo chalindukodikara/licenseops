@@ -1,3 +1,6 @@
+// Copyright 2026 Chalindu Kodikara
+// SPDX-License-Identifier: Apache-2.0
+
 package header
 
 import (
@@ -5,7 +8,7 @@ import (
 	"regexp"
 	"strings"
 
-	"github.com/chalindu/licenser/internal/language"
+	"github.com/chalindu/licenseops/internal/language"
 )
 
 // ReuseFormat implements the FSFE REUSE specification header format.
