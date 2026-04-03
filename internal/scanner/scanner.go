@@ -11,7 +11,7 @@ import (
 	"github.com/bmatcuk/doublestar/v4"
 	ignore "github.com/sabhiram/go-gitignore"
 
-	"github.com/chalindu/licenseops/internal/language"
+	"github.com/chalindukodikara/licenseops/internal/language"
 )
 
 // Scanner walks directories and yields files that should be processed.

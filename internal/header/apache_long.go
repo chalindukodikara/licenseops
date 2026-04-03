@@ -7,7 +7,7 @@ import (
 	"fmt"
 	"strings"
 
-	"github.com/chalindu/licenseops/internal/language"
+	"github.com/chalindukodikara/licenseops/internal/language"
 )
 
 // ApacheLongFormat implements the Apache License 2.0 long-form boilerplate header.

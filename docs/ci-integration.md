@@ -28,7 +28,7 @@ jobs:
 
       - name: Install licenseops
         run: |
-          curl -sSL https://github.com/chalindu/licenseops/releases/latest/download/licenser_Linux_x86_64.tar.gz | tar xz
+          curl -sSL https://github.com/chalindukodikara/licenseops/releases/latest/download/licenser_Linux_x86_64.tar.gz | tar xz
           sudo mv licenseops /usr/local/bin/
 
       - name: Check license headers
@@ -43,7 +43,7 @@ jobs:
           go-version: '1.26'
 
       - name: Install licenseops
-        run: go install github.com/chalindu/licenseops/cmd/licenseops@latest
+        run: go install github.com/chalindukodikara/licenseops/cmd/licenseops@latest
 
       - name: Check license headers
         run: licenseops check
@@ -57,7 +57,7 @@ jobs:
           docker run --rm \
             -v "${{ github.workspace }}":/src \
             -w /src \
-            ghcr.io/chalindu/licenseops check
+            ghcr.io/chalindukodikara/licenseops check
 ```
 
 ### Auto-Fix on PR (Commit Changes)
@@ -79,7 +79,7 @@ jobs:
 
       - name: Install licenseops
         run: |
-          curl -sSL https://github.com/chalindu/licenseops/releases/latest/download/licenser_Linux_x86_64.tar.gz | tar xz
+          curl -sSL https://github.com/chalindukodikara/licenseops/releases/latest/download/licenser_Linux_x86_64.tar.gz | tar xz
           sudo mv licenseops /usr/local/bin/
 
       - name: Fix license headers
@@ -108,7 +108,7 @@ jobs:
           go-version-file: go.mod
 
       - name: Install licenseops
-        run: go install github.com/chalindu/licenseops/cmd/licenseops@latest
+        run: go install github.com/chalindukodikara/licenseops/cmd/licenseops@latest
 
       - name: License headers
         run: licenseops check
@@ -129,7 +129,7 @@ license-check:
   image: golang:1.26-alpine
   stage: lint
   script:
-    - go install github.com/chalindu/licenseops/cmd/licenseops@latest
+    - go install github.com/chalindukodikara/licenseops/cmd/licenseops@latest
     - licenseops check
   rules:
     - if: $CI_MERGE_REQUEST_ID
@@ -145,14 +145,14 @@ Add to `.pre-commit-config.yaml`:
 
 ```yaml
 repos:
-  - repo: https://github.com/chalindu/licenseops
+  - repo: https://github.com/chalindukodikara/licenseops
     rev: v0.1.0
     hooks:
       - id: licenseops-check
         name: Check license headers
         entry: licenseops check
         language: golang
-        additional_dependencies: ["github.com/chalindu/licenseops/cmd/licenseops@v0.1.0"]
+        additional_dependencies: ["github.com/chalindukodikara/licenseops/cmd/licenseops@v0.1.0"]
         always_run: true
         pass_filenames: false
 ```
@@ -161,14 +161,14 @@ repos:
 
 ```yaml
 repos:
-  - repo: https://github.com/chalindu/licenseops
+  - repo: https://github.com/chalindukodikara/licenseops
     rev: v0.1.0
     hooks:
       - id: licenseops-fix
         name: Fix license headers
         entry: licenseops fix
         language: golang
-        additional_dependencies: ["github.com/chalindu/licenseops/cmd/licenseops@v0.1.0"]
+        additional_dependencies: ["github.com/chalindukodikara/licenseops/cmd/licenseops@v0.1.0"]
         always_run: true
         pass_filenames: false
 ```
@@ -203,25 +203,25 @@ Then use in CI:
 ### Check a Local Project
 
 ```bash
-docker run --rm -v "$(pwd)":/src -w /src ghcr.io/chalindu/licenseops check
+docker run --rm -v "$(pwd)":/src -w /src ghcr.io/chalindukodikara/licenseops check
 ```
 
 ### Fix a Local Project
 
 ```bash
-docker run --rm -v "$(pwd)":/src -w /src ghcr.io/chalindu/licenseops fix
+docker run --rm -v "$(pwd)":/src -w /src ghcr.io/chalindukodikara/licenseops fix
 ```
 
 ### With Custom Config
 
 ```bash
-docker run --rm -v "$(pwd)":/src -w /src ghcr.io/chalindu/licenseops check -c my-config.yaml
+docker run --rm -v "$(pwd)":/src -w /src ghcr.io/chalindukodikara/licenseops check -c my-config.yaml
 ```
 
 ### Override All Settings via Flags
 
 ```bash
-docker run --rm -v "$(pwd)":/src -w /src ghcr.io/chalindu/licenseops check \
+docker run --rm -v "$(pwd)":/src -w /src ghcr.io/chalindukodikara/licenseops check \
   -l "Apache-2.0" \
   -o "My Org" \
   -f spdx

@@ -6,10 +6,10 @@ package engine
 import (
 	"fmt"
 
-	"github.com/chalindu/licenseops/internal/config"
-	"github.com/chalindu/licenseops/internal/header"
-	"github.com/chalindu/licenseops/internal/language"
-	"github.com/chalindu/licenseops/internal/scanner"
+	"github.com/chalindukodikara/licenseops/internal/config"
+	"github.com/chalindukodikara/licenseops/internal/header"
+	"github.com/chalindukodikara/licenseops/internal/language"
+	"github.com/chalindukodikara/licenseops/internal/scanner"
 )
 
 // Result holds the outcome of a check or fix operation.

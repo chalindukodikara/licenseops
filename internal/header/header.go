@@ -9,7 +9,7 @@ import (
 	"regexp"
 	"strings"
 
-	"github.com/chalindu/licenseops/internal/language"
+	"github.com/chalindukodikara/licenseops/internal/language"
 )
 
 // Shared regex patterns used by multiple formats.
@@ -33,7 +33,7 @@ func IsGenerated(path string) (bool, error) {
 	if err != nil {
 		return false, err
 	}
-	defer f.Close()
+	defer func() { _ = f.Close() }()
 
 	scanner := bufio.NewScanner(f)
 	for i := 0; i < 30 && scanner.Scan(); i++ {
@@ -51,7 +51,7 @@ func ReadHeaderLines(path string, n int) ([]string, error) {
 	if err != nil {
 		return nil, err
 	}
-	defer f.Close()
+	defer func() { _ = f.Close() }()
 
 	scanner := bufio.NewScanner(f)
 	var lines []string
@@ -89,7 +89,6 @@ func Prepend(path string, style *language.Style, headerText string, fmt Format) 
 
 	// Try stripping with ALL formats and pick the result that removed the most.
 	// This handles cross-format migration (e.g. GPL-long → SPDX).
-	stripped := src
 	best := src
 	for _, f := range AllFormats() {
 		candidate := f.StripExisting(src, style)
@@ -102,7 +101,7 @@ func Prepend(path string, style *language.Style, headerText string, fmt Format) 
 	if len(candidate) < len(best) {
 		best = candidate
 	}
-	stripped = best
+	stripped := best
 
 	lines := strings.Split(string(stripped), "\n")
 	i := 0
@@ -169,7 +168,7 @@ func skipPreamble(lines []string) int {
 }
 
 // reconstructAfterStrip builds the result after header stripping.
-func reconstructAfterStrip(lines []string, src []byte, headerEnd int) []byte {
+func reconstructAfterStrip(lines []string, _ []byte, headerEnd int) []byte {
 	// Skip one trailing blank line after the header
 	if headerEnd < len(lines) && strings.TrimSpace(lines[headerEnd]) == "" {
 		headerEnd++

@@ -9,8 +9,8 @@ import (
 
 	"github.com/spf13/cobra"
 
-	"github.com/chalindu/licenseops/internal/config"
-	"github.com/chalindu/licenseops/internal/engine"
+	"github.com/chalindukodikara/licenseops/internal/config"
+	"github.com/chalindukodikara/licenseops/internal/engine"
 )
 
 var version = "dev"

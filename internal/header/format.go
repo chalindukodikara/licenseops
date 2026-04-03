@@ -6,7 +6,7 @@ package header
 import (
 	"fmt"
 
-	"github.com/chalindu/licenseops/internal/language"
+	"github.com/chalindukodikara/licenseops/internal/language"
 )
 
 // Format defines how license headers are generated, detected, and stripped.

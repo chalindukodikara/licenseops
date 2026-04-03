@@ -7,7 +7,7 @@ import (
 	"fmt"
 	"strings"
 
-	"github.com/chalindu/licenseops/internal/language"
+	"github.com/chalindukodikara/licenseops/internal/language"
 )
 
 // GPLLongFormat implements the GNU GPL/LGPL/AGPL long-form boilerplate header.

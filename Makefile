@@ -3,7 +3,7 @@
 
 BINARY := licenseops
 CMD := ./cmd/licenseops
-MODULE := github.com/chalindu/licenseops
+MODULE := github.com/chalindukodikara/licenseops
 VERSION ?= dev
 LDFLAGS := -ldflags "-s -w -X main.version=$(VERSION)"
 

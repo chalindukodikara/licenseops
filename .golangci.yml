@@ -7,15 +7,9 @@ run:
   timeout: 5m
 
 linters:
+  default: standard
   enable:
-    - errcheck
-    - govet
-    - ineffassign
-    - staticcheck
-    - unused
-    - gosimple
     - gocritic
-    - gofmt
     - misspell
     - unconvert
     - unparam
@@ -25,9 +19,6 @@ linters:
       enabled-tags:
         - diagnostic
         - style
-      disabled-checks:
-        - hugeParam
-        - rangeValCopy
 
     misspell:
       locale: US

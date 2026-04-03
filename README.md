@@ -18,23 +18,23 @@ A fast CLI tool to check, fix, and migrate license headers across 50+ languages.
 
 ### Binary (recommended)
 
-Download from [Releases](https://github.com/chalindu/licenseops/releases):
+Download from [Releases](https://github.com/chalindukodikara/licenseops/releases):
 
 ```bash
-curl -sSL https://github.com/chalindu/licenseops/releases/latest/download/licenser_Linux_x86_64.tar.gz | tar xz
+curl -sSL https://github.com/chalindukodikara/licenseops/releases/latest/download/licenser_Linux_x86_64.tar.gz | tar xz
 sudo mv licenseops /usr/local/bin/
 ```
 
 ### Go install
 
 ```bash
-go install github.com/chalindu/licenseops/cmd/licenseops@latest
+go install github.com/chalindukodikara/licenseops/cmd/licenseops@latest
 ```
 
 ### Docker
 
 ```bash
-docker run --rm -v "$PWD":/src -w /src ghcr.io/chalindu/licenseops check -l MIT -o "Your Name"
+docker run --rm -v "$PWD":/src -w /src ghcr.io/chalindukodikara/licenseops check -l MIT -o "Your Name"
 ```
 
 ## Quick Start
@@ -178,7 +178,7 @@ licenseops check -l "GPL-3.0-only WITH Classpath-exception-2.0" -o "Acme Corp" .
 ```yaml
 - name: Check license headers
   run: |
-    curl -sSL https://github.com/chalindu/licenseops/releases/latest/download/licenser_Linux_x86_64.tar.gz | tar xz
+    curl -sSL https://github.com/chalindukodikara/licenseops/releases/latest/download/licenser_Linux_x86_64.tar.gz | tar xz
     ./licenseops check
 ```
 
@@ -194,7 +194,7 @@ licenseops check -l "GPL-3.0-only WITH Classpath-exception-2.0" -o "Acme Corp" .
 
 ```yaml
 repos:
-  - repo: https://github.com/chalindu/licenseops
+  - repo: https://github.com/chalindukodikara/licenseops
     rev: v0.2.0
     hooks:
       - id: licenseops

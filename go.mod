@@ -1,4 +1,4 @@
-module github.com/chalindu/licenseops
+module github.com/chalindukodikara/licenseops
 
 go 1.26.1
 
