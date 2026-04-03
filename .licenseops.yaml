@@ -5,6 +5,5 @@ format: spdx
 exclude:
   - "vendor/**"
   - "node_modules/**"
-  - "example/**"
   - "dist/**"
   - "docs/examples/**"
