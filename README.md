@@ -36,7 +36,14 @@ go install github.com/chalindukodikara/licenseops/cmd/lops@latest
 ### Docker
 
 ```bash
-docker run --rm -v "$PWD":/src -w /src ghcr.io/chalindukodikara/licenseops check
+# Latest stable release
+docker run --rm -v "$PWD":/src -w /src ghcr.io/chalindukodikara/licenseops:latest check
+
+# Pinned to exact version
+docker run --rm -v "$PWD":/src -w /src ghcr.io/chalindukodikara/licenseops:0.1.0 check
+
+# Latest development build (tracks main branch)
+docker run --rm -v "$PWD":/src -w /src ghcr.io/chalindukodikara/licenseops:latest-dev check
 ```
 
 ## Quick Start
