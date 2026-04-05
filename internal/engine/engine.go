@@ -5,6 +5,7 @@ package engine
 
 import (
 	"fmt"
+	"os"
 
 	"github.com/chalindukodikara/licenseops/internal/config"
 	"github.com/chalindukodikara/licenseops/internal/header"
@@ -18,13 +19,15 @@ type Result struct {
 	Fixed        []string
 	Skipped      []string
 	Errors       map[string]error
+	Warnings     []string
 }
 
 // Engine orchestrates license header checking and fixing.
 type Engine struct {
-	cfg     config.Config
-	scanner *scanner.Scanner
-	format  header.Format
+	cfg      config.Config
+	scanner  *scanner.Scanner
+	format   header.Format
+	warnings []string // SPDX deprecation warnings from config validation
 }
 
 // New creates an Engine from the given config.
@@ -48,10 +51,16 @@ func New(cfg config.Config) (*Engine, error) {
 	}
 
 	return &Engine{
-		cfg:     cfg,
-		scanner: scanner.New(root, cfg.Exclude, cfg.ShouldUseGitignore()),
-		format:  f,
+		cfg:      cfg,
+		scanner:  scanner.New(root, cfg.Exclude, cfg.ShouldUseGitignore()),
+		format:   f,
 	}, nil
+}
+
+// SetWarnings stores config-level warnings (e.g. deprecated SPDX IDs)
+// to be included in every result.
+func (e *Engine) SetWarnings(w []string) {
+	e.warnings = w
 }
 
 // Check scans files and reports which ones are non-compliant.
@@ -64,6 +73,74 @@ func (e *Engine) Fix(dryRun, verbose bool) (*Result, error) {
 	return e.run(!dryRun, verbose)
 }
 
+// Remove strips license headers from all scanned files.
+func (e *Engine) Remove(dryRun, verbose bool) (*Result, error) {
+	files, err := e.scanner.Scan(e.cfg.Paths)
+	if err != nil {
+		return nil, fmt.Errorf("scanning files: %w", err)
+	}
+
+	result := &Result{
+		Errors:   make(map[string]error),
+		Warnings: e.warnings,
+	}
+
+	allFormats := header.AllFormats()
+	// Also include the configured format (may be custom)
+	allFormats = append(allFormats, e.format)
+
+	for _, path := range files {
+		style := language.ForPath(path)
+		if style == nil {
+			result.Skipped = append(result.Skipped, path)
+			continue
+		}
+
+		src, err := os.ReadFile(path)
+		if err != nil {
+			result.Errors[path] = err
+			continue
+		}
+
+		// Try stripping with all formats and pick the result that removed the most
+		best := src
+		for _, f := range allFormats {
+			candidate := f.StripExisting(src, style)
+			if len(candidate) < len(best) {
+				best = candidate
+			}
+		}
+
+		if len(best) == len(src) {
+			// No header found
+			if verbose {
+				fmt.Printf("  skip (no header): %s\n", path)
+			}
+			continue
+		}
+
+		result.NonCompliant = append(result.NonCompliant, path)
+
+		if !dryRun {
+			info, err := os.Stat(path)
+			if err != nil {
+				result.Errors[path] = err
+				continue
+			}
+			if err := os.WriteFile(path, best, info.Mode()); err != nil {
+				result.Errors[path] = err
+				continue
+			}
+			result.Fixed = append(result.Fixed, path)
+			if verbose {
+				fmt.Printf("  removed: %s\n", path)
+			}
+		}
+	}
+
+	return result, nil
+}
+
 func (e *Engine) run(fix, verbose bool) (*Result, error) {
 	files, err := e.scanner.Scan(e.cfg.Paths)
 	if err != nil {
@@ -71,7 +148,8 @@ func (e *Engine) run(fix, verbose bool) (*Result, error) {
 	}
 
 	result := &Result{
-		Errors: make(map[string]error),
+		Errors:   make(map[string]error),
+		Warnings: e.warnings,
 	}
 
 	for _, path := range files {
