@@ -53,9 +53,10 @@ export GIT_REMOTE=origin  # remote name for github.com/chalindukodikara/licenseo
 
 Skip these steps if you are creating a patch release.
 
-- [ ] Checkout the `main` branch, ensure it is up to date, and your local branch is clean:
+- [ ] Create the release branch from the latest `main`:
     ```bash
-    git checkout -b release-prep-v${MAJOR_VERSION}.${MINOR_VERSION}.${PATCH_VERSION} ${GIT_REMOTE}/main
+    git fetch ${GIT_REMOTE}
+    git checkout -b release-v${MAJOR_VERSION}.${MINOR_VERSION} ${GIT_REMOTE}/main
     ```
 - [ ] Run the [pre-release checklist](#pre-release-checklist)
 - [ ] Make any release prep changes (doc updates, changelog):
@@ -64,10 +65,6 @@ Skip these steps if you are creating a patch release.
     ```bash
     git add -A
     git commit -m "chore: prepare release v${MAJOR_VERSION}.${MINOR_VERSION}.${PATCH_VERSION}"
-    ```
-- [ ] Create the release branch:
-    ```bash
-    git checkout -b release-v${MAJOR_VERSION}.${MINOR_VERSION}
     ```
 - [ ] Push the release branch:
     ```bash
@@ -82,9 +79,11 @@ Skip these steps if you are creating a patch release.
 
 Skip these steps if you are creating a major or minor release.
 
-- [ ] Checkout the existing release branch, ensure it is up to date, and your local branch is clean:
+- [ ] Checkout the existing release branch and ensure it is up to date:
     ```bash
-    git checkout -b release-prep-v${MAJOR_VERSION}.${MINOR_VERSION}.${PATCH_VERSION} ${GIT_REMOTE}/release-v${MAJOR_VERSION}.${MINOR_VERSION}
+    git fetch ${GIT_REMOTE}
+    git checkout release-v${MAJOR_VERSION}.${MINOR_VERSION}
+    git pull ${GIT_REMOTE} release-v${MAJOR_VERSION}.${MINOR_VERSION}
     ```
 - [ ] Apply the fix (cherry-pick from `main` or commit directly):
     ```bash
@@ -93,9 +92,8 @@ Skip these steps if you are creating a major or minor release.
 - [ ] Run the [pre-release checklist](#pre-release-checklist)
 - [ ] Push the changes to the release branch:
     ```bash
-    git push ${GIT_REMOTE} release-prep-v${MAJOR_VERSION}.${MINOR_VERSION}.${PATCH_VERSION}
+    git push ${GIT_REMOTE} release-v${MAJOR_VERSION}.${MINOR_VERSION}
     ```
-- [ ] Open a PR from `release-prep-v${MAJOR_VERSION}.${MINOR_VERSION}.${PATCH_VERSION}` → `release-v${MAJOR_VERSION}.${MINOR_VERSION}` and get it merged.
 - [ ] Wait for [CI](https://github.com/chalindukodikara/licenseops/actions/workflows/ci.yml) to pass on the release branch.
 - [ ] Proceed to [Tag the Release](#tag-the-release).
 
@@ -103,11 +101,6 @@ Skip these steps if you are creating a major or minor release.
 
 ### Tag the Release
 
-- [ ] Ensure you are on the release branch:
-    ```bash
-    git fetch ${GIT_REMOTE}
-    git checkout ${GIT_REMOTE}/release-v${MAJOR_VERSION}.${MINOR_VERSION}
-    ```
 - [ ] Create and push the tag:
     ```bash
     git tag v${MAJOR_VERSION}.${MINOR_VERSION}.${PATCH_VERSION}
@@ -199,5 +192,4 @@ Before tagging a release:
 |--------|---------|----------|
 | `main` | Stable development branch | Permanent |
 | `release-v{major}.{minor}` | Release branch, tags are cut from here | Permanent per minor version |
-| `release-prep-v{major}.{minor}.{patch}` | Prep work before tagging a release | Merged to release branch, then deleted |
 | `feature/*` | Feature development | Merged to `main` via PR |
