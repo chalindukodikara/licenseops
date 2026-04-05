@@ -22,68 +22,114 @@ When a PR is merged (push to `main`), the same CI jobs run, plus:
 
 | Job | What it does |
 |-----|--------------|
-| `docker-latest` | Builds and pushes `ghcr.io/chalindukodikara/licenseops:latest` |
+| `docker-latest-dev` | Builds and pushes `ghcr.io/chalindukodikara/licenseops:latest-dev` |
 
-This means the `:latest` Docker tag **always tracks the `main` branch**. Every merge to `main` updates it.
+This means the `:latest-dev` Docker tag **always tracks the `main` branch**. Every merge to `main` updates it.
 
 ```bash
-# Always gets the latest main build
-docker pull ghcr.io/chalindukodikara/licenseops:latest
+# Always gets the latest main build (may be unreleased)
+docker pull ghcr.io/chalindukodikara/licenseops:latest-dev
 ```
 
 ## Creating a Release
 
-Releases are cut from a **release branch** and triggered by pushing a Git tag.
+### Prerequisites
 
-### Steps
+- Push access to the repository
+- Check [existing releases](https://github.com/chalindukodikara/licenseops/releases) for the latest version number
 
-1. **Make sure `main` is clean and CI passes.**
+Export the environment variables for use in subsequent steps:
 
-2. **Create a release branch from `main`:**
-   ```bash
-   git checkout main
-   git pull origin main
-   git checkout -b release/v0.1.0
-   ```
+```bash
+export MAJOR_VERSION=<MAJOR>
+export MINOR_VERSION=<MINOR>
+export PATCH_VERSION=<PATCH>
+export GIT_REMOTE=origin  # remote name for github.com/chalindukodikara/licenseops
+```
 
-3. **Prepare the release on the branch:**
-   - Run the full pre-release checklist (see below)
-   - Make any last-minute fixes (version bumps, changelog updates)
-   - Push the branch:
-   ```bash
-   git push origin release/v0.1.0
-   ```
+---
 
-4. **Open a PR from the release branch to `main`** for final review.
-   This ensures CI runs against the exact code that will be released.
+### Major/Minor Release (e.g. v0.2.0, v1.0.0)
 
-5. **Merge the PR**, then tag from `main`:**
-   ```bash
-   git checkout main
-   git pull origin main
-   git tag v0.1.0
-   git push origin v0.1.0
-   ```
+Skip these steps if you are creating a patch release.
 
-6. **The release workflow runs automatically and creates a draft release:**
+- [ ] Checkout the `main` branch, ensure it is up to date, and your local branch is clean:
+    ```bash
+    git checkout -b release-prep-v${MAJOR_VERSION}.${MINOR_VERSION}.${PATCH_VERSION} ${GIT_REMOTE}/main
+    ```
+- [ ] Run the [pre-release checklist](#pre-release-checklist)
+- [ ] Make any release prep changes (doc updates, changelog):
+    - For **major releases**: update version references across docs, README, and examples.
+      Document breaking changes and add a migration guide if needed.
+    ```bash
+    git add -A
+    git commit -m "chore: prepare release v${MAJOR_VERSION}.${MINOR_VERSION}.${PATCH_VERSION}"
+    ```
+- [ ] Create the release branch:
+    ```bash
+    git checkout -b release-v${MAJOR_VERSION}.${MINOR_VERSION}
+    ```
+- [ ] Push the release branch:
+    ```bash
+    git push ${GIT_REMOTE} release-v${MAJOR_VERSION}.${MINOR_VERSION}
+    ```
+- [ ] Wait for [CI](https://github.com/chalindukodikara/licenseops/actions/workflows/ci.yml) to pass on the release branch.
+- [ ] Proceed to [Tag the Release](#tag-the-release).
 
-   | Job | What it does |
-   |-----|--------------|
-   | `goreleaser` | Builds binaries, creates a **draft** GitHub Release with auto-generated changelog |
-   | `docker` | Builds and pushes versioned Docker images to GHCR |
+---
 
-7. **Review the draft release on GitHub:**
-   - Go to [Releases](https://github.com/chalindukodikara/licenseops/releases)
-   - The draft will be at the top with a "Draft" badge
-   - Review the auto-generated changelog — it groups commits into **Features**, **Bug Fixes**, and **Other**
-   - Edit the release notes if needed (add summary, highlights, breaking changes, upgrade instructions)
-   - Verify the binary assets are attached
+### Patch Release (e.g. v0.2.1)
 
-8. **Publish the release:**
-   - Click **"Publish release"** to make it public
-   - This makes the binaries downloadable and the release visible to users
+Skip these steps if you are creating a major or minor release.
+
+- [ ] Checkout the existing release branch, ensure it is up to date, and your local branch is clean:
+    ```bash
+    git checkout -b release-prep-v${MAJOR_VERSION}.${MINOR_VERSION}.${PATCH_VERSION} ${GIT_REMOTE}/release-v${MAJOR_VERSION}.${MINOR_VERSION}
+    ```
+- [ ] Apply the fix (cherry-pick from `main` or commit directly):
+    ```bash
+    git commit -m "fix: <description>"
+    ```
+- [ ] Run the [pre-release checklist](#pre-release-checklist)
+- [ ] Push the changes to the release branch:
+    ```bash
+    git push ${GIT_REMOTE} release-prep-v${MAJOR_VERSION}.${MINOR_VERSION}.${PATCH_VERSION}
+    ```
+- [ ] Open a PR from `release-prep-v${MAJOR_VERSION}.${MINOR_VERSION}.${PATCH_VERSION}` → `release-v${MAJOR_VERSION}.${MINOR_VERSION}` and get it merged.
+- [ ] Wait for [CI](https://github.com/chalindukodikara/licenseops/actions/workflows/ci.yml) to pass on the release branch.
+- [ ] Proceed to [Tag the Release](#tag-the-release).
+
+---
+
+### Tag the Release
+
+- [ ] Ensure you are on the release branch:
+    ```bash
+    git fetch ${GIT_REMOTE}
+    git checkout ${GIT_REMOTE}/release-v${MAJOR_VERSION}.${MINOR_VERSION}
+    ```
+- [ ] Create and push the tag:
+    ```bash
+    git tag v${MAJOR_VERSION}.${MINOR_VERSION}.${PATCH_VERSION}
+    git push ${GIT_REMOTE} v${MAJOR_VERSION}.${MINOR_VERSION}.${PATCH_VERSION}
+    ```
+- [ ] Wait for [Release](https://github.com/chalindukodikara/licenseops/actions/workflows/release.yml) to pass — see [What Gets Created](#what-gets-created).
+- [ ] Verify the [draft release](https://github.com/chalindukodikara/licenseops/releases) created by the workflow.
+- [ ] Edit the release notes if needed (add summary, highlights, breaking changes, upgrade instructions).
+    For **major releases**, add a **Breaking Changes** section and include migration instructions.
+- [ ] Mark as **Latest** if this is the latest release. (If the current release is v0.1.1 while v0.2.0 exists, skip marking as latest.)
+- [ ] Publish the release.
+
+---
 
 ### What Gets Created
+
+When the tag is pushed, the release workflow (`release.yml`) runs:
+
+| Job | What it does |
+|-----|--------------|
+| `goreleaser` | Builds binaries, creates a **draft** GitHub Release with auto-generated changelog |
+| `docker` | Builds and pushes versioned Docker images to GHCR |
 
 **GitHub Release (draft)** — via GoReleaser:
 - `lops_Linux_x86_64.tar.gz`
@@ -97,8 +143,8 @@ Releases are cut from a **release branch** and triggered by pushing a Git tag.
   - **Other** — everything else (excludes `docs:`, `test:`, `ci:`, `chore:`)
 
 **Docker images** (pushed to GHCR):
-- `ghcr.io/chalindukodikara/licenseops:0.1.0` — exact version
-- `ghcr.io/chalindukodikara/licenseops:0.1` — major.minor (moves with patch releases)
+- `ghcr.io/chalindukodikara/licenseops:0.2.0` — exact version
+- `ghcr.io/chalindukodikara/licenseops:0.2` — major.minor (moves with patch releases)
 - `ghcr.io/chalindukodikara/licenseops:latest` — latest release
 
 ### Commit Message Convention
@@ -132,7 +178,8 @@ Tag format must be `v` followed by semver: `v0.1.0`, `v0.2.0`, `v1.0.0`.
 
 | Tag | Updated when | Use for |
 |-----|-------------|---------|
-| `:latest` | Every merge to `main` | Development, always up-to-date |
+| `:latest` | Release tag pushed | Production, latest stable release |
+| `:latest-dev` | Every merge to `main` | Development, always up-to-date (may be unreleased) |
 | `:0.1.0` | Release `v0.1.0` tag pushed | Production, pinned to exact version |
 | `:0.1` | Release `v0.1.x` tag pushed | Production, gets patch updates |
 
@@ -140,41 +187,17 @@ Tag format must be `v` followed by semver: `v0.1.0`, `v0.2.0`, `v1.0.0`.
 
 Before tagging a release:
 
-- [ ] All CI checks pass on `main`
+- [ ] All CI checks pass on the release branch
 - [ ] `make lint` passes locally
 - [ ] `make test` passes locally
 - [ ] `lops check` passes on the repo itself
 - [ ] Update version references in docs if needed
-- [ ] Verify `RELEASE.md` changelog is up to date
-
-## Hotfix Process
-
-For urgent fixes to a released version:
-
-```bash
-# Branch from the release tag
-git checkout -b hotfix/v0.1.1 v0.1.0
-
-# Make the fix, commit
-git commit -m "fix: critical bug"
-
-# Push the hotfix branch and open a PR to main
-git push origin hotfix/v0.1.1
-
-# After PR is reviewed and merged to main, tag from main
-git checkout main
-git pull origin main
-git tag v0.1.1
-git push origin v0.1.1
-```
-
-The release workflow triggers on any `v*` tag, regardless of branch.
 
 ## Branch Summary
 
 | Branch | Purpose | Lifetime |
 |--------|---------|----------|
-| `main` | Stable development branch, all releases are tagged here | Permanent |
-| `release/v0.x.0` | Release preparation (final fixes, changelog) | Merged to `main`, then deleted |
-| `hotfix/v0.x.y` | Urgent patches to a released version | Merged to `main`, then deleted |
+| `main` | Stable development branch | Permanent |
+| `release-v{major}.{minor}` | Release branch, tags are cut from here | Permanent per minor version |
+| `release-prep-v{major}.{minor}.{patch}` | Prep work before tagging a release | Merged to release branch, then deleted |
 | `feature/*` | Feature development | Merged to `main` via PR |
