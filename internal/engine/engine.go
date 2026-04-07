@@ -1,4 +1,4 @@
-// Copyright 2026 Chalindu Kodikara
+// Copyright 2026 The LicenseOps Authors
 // SPDX-License-Identifier: Apache-2.0
 
 package engine
@@ -76,6 +76,13 @@ func New(cfg config.Config) (*Engine, error) {
 // to be included in every result.
 func (e *Engine) SetWarnings(w []string) {
 	e.warnings = w
+}
+
+// SetInverseExcludes flips the scanner's exclude semantics. When true, only
+// files MATCHING exclude patterns are returned by the scanner. Useful for
+// `lops remove --excluded-only` to clean up headers in excluded files.
+func (e *Engine) SetInverseExcludes(b bool) {
+	e.scanner.SetInverseExcludes(b)
 }
 
 // Check scans files and reports which ones are non-compliant.

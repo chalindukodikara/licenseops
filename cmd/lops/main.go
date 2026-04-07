@@ -1,4 +1,4 @@
-// Copyright 2026 Chalindu Kodikara
+// Copyright 2026 The LicenseOps Authors
 // SPDX-License-Identifier: Apache-2.0
 
 package main
@@ -369,6 +369,7 @@ for non-interactive use.`,
 
 func removeCmd() *cobra.Command {
 	var dryRun bool
+	var excludedOnly bool
 
 	cmd := &cobra.Command{
 		Use:   "remove [paths...]",
@@ -379,11 +380,24 @@ Tries all known header formats (SPDX, REUSE, Apache, GPL) to detect
 and strip existing headers. Files without recognized headers are left
 unchanged.
 
-Use --dry-run to see what would change without modifying files.`,
+Use --dry-run to see what would change without modifying files.
+
+Use --excluded-only to invert the scan and process only files that
+match an 'exclude' pattern in your config. This is the cleanup helper
+for cases where you've added new excludes and want to strip leftover
+headers from those files in one shot.`,
 		RunE: func(cmd *cobra.Command, args []string) error {
 			cfg, warnings, err := loadConfig(cmd, args)
 			if err != nil {
 				return err
+			}
+
+			// In --excluded-only mode we want the inverse scan to target
+			// only the patterns the user explicitly declared in their
+			// config file — not built-in defaults like .git/** or the
+			// auto-added config-file path. Swap to UserExcludes for that.
+			if excludedOnly {
+				cfg.Exclude = cfg.UserExcludes
 			}
 
 			eng, err := engine.New(cfg)
@@ -391,6 +405,9 @@ Use --dry-run to see what would change without modifying files.`,
 				return err
 			}
 			eng.SetWarnings(warnings)
+			if excludedOnly {
+				eng.SetInverseExcludes(true)
+			}
 
 			result, err := eng.Remove(dryRun, flagVerbose)
 			if err != nil {
@@ -427,6 +444,7 @@ Use --dry-run to see what would change without modifying files.`,
 	}
 
 	cmd.Flags().BoolVar(&dryRun, "dry-run", false, "show what would change without modifying files")
+	cmd.Flags().BoolVar(&excludedOnly, "excluded-only", false, "only process files matching user-defined exclude patterns (cleanup helper)")
 	return cmd
 }
 

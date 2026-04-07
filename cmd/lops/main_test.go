@@ -1,4 +1,4 @@
-// Copyright 2026 Chalindu Kodikara
+// Copyright 2026 The LicenseOps Authors
 // SPDX-License-Identifier: Apache-2.0
 
 package main

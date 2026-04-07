@@ -22,30 +22,30 @@ A fast CLI tool to check, fix, and migrate license headers across 50+ languages.
 
 ### Binary
 
-Download from [Releases](https://github.com/chalindukodikara/licenseops/releases):
+Download from [Releases](https://github.com/licenseops/licenseops/releases):
 
 ```bash
-curl -sSL https://github.com/chalindukodikara/licenseops/releases/latest/download/lops_Linux_x86_64.tar.gz | tar xz
+curl -sSL https://github.com/licenseops/licenseops/releases/latest/download/lops_Linux_x86_64.tar.gz | tar xz
 sudo mv lops /usr/local/bin/
 ```
 
 ### Go install
 
 ```bash
-go install github.com/chalindukodikara/licenseops/cmd/lops@latest
+go install github.com/licenseops/licenseops/cmd/lops@latest
 ```
 
 ### Docker
 
 ```bash
 # Latest stable release
-docker run --rm -v "$PWD":/src -w /src ghcr.io/chalindukodikara/licenseops:latest check
+docker run --rm -v "$PWD":/src -w /src ghcr.io/licenseops/licenseops:latest check
 
 # Pinned to exact version
-docker run --rm -v "$PWD":/src -w /src ghcr.io/chalindukodikara/licenseops:0.1.0 check
+docker run --rm -v "$PWD":/src -w /src ghcr.io/licenseops/licenseops:0.1.0 check
 
 # Latest development build (tracks main branch)
-docker run --rm -v "$PWD":/src -w /src ghcr.io/chalindukodikara/licenseops:latest-dev check
+docker run --rm -v "$PWD":/src -w /src ghcr.io/licenseops/licenseops:latest-dev check
 ```
 
 ## Quick Start
@@ -77,9 +77,15 @@ lops fix --diff
 **Remove** all headers:
 
 ```bash
-lops remove --dry-run    # preview first
-lops remove              # then remove
+lops remove --dry-run                    # preview first
+lops remove                              # then remove
+lops remove --excluded-only --dry-run    # preview cleanup of excluded files
+lops remove --excluded-only              # strip headers from files in your exclude list
 ```
+
+`--excluded-only` inverts the scan: it walks the tree and processes only files
+that match an `exclude:` pattern in your `.licenseops.yaml`. Useful right after
+adding new excludes to clean up leftover headers in those files.
 
 **Config file** — create `.licenseops.yaml` in your project root (or use `lops init`):
 
@@ -148,6 +154,24 @@ lops remove              # strip all recognized headers
 
 Even if your config says `format: spdx`, `remove` will detect and strip Apache, GPL, REUSE, and custom headers too.
 
+### Cleaning up headers in excluded files
+
+When you add a new entry to your `exclude:` list (e.g. `Dockerfile`,
+`.github/workflows/**`), files that already had a header keep it because
+`lops check` and `lops fix` skip excluded paths. Use `--excluded-only` to
+strip headers from those files in one shot:
+
+```bash
+lops remove --excluded-only --dry-run    # preview which excluded files have headers
+lops remove --excluded-only              # strip them
+```
+
+This inverts the scanner: it walks the entire tree but only processes files
+matching a pattern in your `.licenseops.yaml` `exclude:` block. Built-in
+defaults (`.git/**`, `vendor/**`, `node_modules/**`, `third_party/**`,
+`.licenseops.yaml`) and gitignore filtering are intentionally ignored in this
+mode, so the cleanup targets exactly what you declared excluded.
+
 ## Configuration
 
 `lops` automatically looks for `.licenseops.yaml` in the current directory. If not found, it silently uses built-in defaults — no error. You can always override with CLI flags, or skip the config file entirely.
@@ -175,15 +199,17 @@ gitignore: true                    # respect .gitignore patterns
 ### CLI Flags
 
 ```
--l, --license     SPDX license identifier or expression
--o, --owner       copyright holder
--f, --format      header format (spdx, reuse, apache-long, gpl-long, custom)
--y, --year        copyright year
--c, --config      config file path (default: .licenseops.yaml)
--v, --verbose     show status of every file
-    --dry-run     preview changes without modifying files (fix/remove)
-    --diff        show unified diff of changes (fix, implies dry-run)
-    --output      output format: text (default), json, sarif
+-l, --license         SPDX license identifier or expression
+-o, --owner           copyright holder
+-f, --format          header format (spdx, reuse, apache-long, gpl-long, custom)
+-y, --year            copyright year
+-c, --config          config file path (default: .licenseops.yaml)
+-v, --verbose         show status of every file
+    --dry-run         preview changes without modifying files (fix/remove)
+    --diff            show unified diff of changes (fix, implies dry-run)
+    --excluded-only   invert scan; process only files matching exclude
+                      patterns from your config (remove only)
+    --output          output format: text (default), json, sarif
 ```
 
 Precedence: **CLI flags > config file > defaults**
@@ -202,7 +228,7 @@ lops check -l "GPL-3.0-only WITH Classpath-exception-2.0" -o "Acme Corp" .
 ```yaml
 - name: Check license headers
   run: |
-    curl -sSL https://github.com/chalindukodikara/licenseops/releases/latest/download/lops_Linux_x86_64.tar.gz | tar xz
+    curl -sSL https://github.com/licenseops/licenseops/releases/latest/download/lops_Linux_x86_64.tar.gz | tar xz
     ./lops check
 ```
 

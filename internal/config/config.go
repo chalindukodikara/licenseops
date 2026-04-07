@@ -1,4 +1,4 @@
-// Copyright 2026 Chalindu Kodikara
+// Copyright 2026 The LicenseOps Authors
 // SPDX-License-Identifier: Apache-2.0
 
 package config
@@ -23,6 +23,13 @@ type Config struct {
 	Exclude         []string `yaml:"exclude"`
 	SkipGenerated   *bool    `yaml:"skip-generated"`
 	Gitignore       *bool    `yaml:"gitignore"`
+
+	// UserExcludes holds ONLY the exclude patterns the user explicitly
+	// declared in their config file (no built-in defaults, no auto-added
+	// config-file path). It is populated by Load() and used by features
+	// like `lops remove --excluded-only` that need to operate on the
+	// user's explicit excludes rather than the merged set.
+	UserExcludes []string `yaml:"-"`
 }
 
 // Defaults returns a Config with default values applied.
@@ -83,6 +90,7 @@ func Load(path string) (Config, error) {
 	}
 	if len(fileCfg.Exclude) > 0 {
 		cfg.Exclude = append(cfg.Exclude, fileCfg.Exclude...)
+		cfg.UserExcludes = append(cfg.UserExcludes, fileCfg.Exclude...)
 	}
 	if fileCfg.SkipGenerated != nil {
 		cfg.SkipGenerated = fileCfg.SkipGenerated

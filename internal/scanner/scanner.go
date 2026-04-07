@@ -1,4 +1,4 @@
-// Copyright 2026 Chalindu Kodikara
+// Copyright 2026 The LicenseOps Authors
 // SPDX-License-Identifier: Apache-2.0
 
 package scanner
@@ -16,9 +16,13 @@ import (
 
 // Scanner walks directories and yields files that should be processed.
 type Scanner struct {
-	excludes   []string
-	gitignore  *ignore.GitIgnore
+	excludes        []string
+	gitignore       *ignore.GitIgnore
 	skipUnsupported bool
+	// inverseExcludes flips exclude semantics: only files MATCHING exclude
+	// patterns are returned. Used by `lops remove --excluded-only` to clean
+	// up headers in files the user has excluded from regular checks.
+	inverseExcludes bool
 }
 
 // New creates a Scanner with the given exclude patterns.
@@ -37,6 +41,14 @@ func New(root string, excludes []string, useGitignore bool) *Scanner {
 	}
 
 	return s
+}
+
+// SetInverseExcludes flips exclude semantics. When true, the scanner walks
+// the entire tree and returns only files that MATCH an exclude pattern.
+// Gitignore filtering is also disabled in this mode so excluded files are
+// reachable even if they live in gitignored directories.
+func (s *Scanner) SetInverseExcludes(b bool) {
+	s.inverseExcludes = b
 }
 
 // Scan walks the given paths and returns all files that should be processed.
@@ -69,18 +81,26 @@ func (s *Scanner) Scan(paths []string) ([]string, error) {
 			}
 
 			if d.IsDir() {
-				if s.isExcluded(rel) || s.isExcluded(path) {
+				// In inverse mode we must traverse INTO excluded dirs to reach
+				// the files inside them, so never SkipDir.
+				if !s.inverseExcludes && (s.isExcluded(rel) || s.isExcluded(path)) {
 					return filepath.SkipDir
 				}
 				return nil
 			}
 
-			if s.isExcluded(rel) || s.isExcluded(path) {
-				return nil
-			}
-
-			if s.gitignore != nil && s.gitignore.MatchesPath(rel) {
-				return nil
+			excluded := s.isExcluded(rel) || s.isExcluded(path)
+			if s.inverseExcludes {
+				if !excluded {
+					return nil
+				}
+			} else {
+				if excluded {
+					return nil
+				}
+				if s.gitignore != nil && s.gitignore.MatchesPath(rel) {
+					return nil
+				}
 			}
 
 			if s.skipUnsupported && !language.Supported(path) {
@@ -121,8 +141,15 @@ func (s *Scanner) isExcluded(path string) bool {
 
 // shouldProcess checks if a single file should be processed.
 func (s *Scanner) shouldProcess(path string) bool {
-	if s.isExcluded(path) {
-		return false
+	excluded := s.isExcluded(path)
+	if s.inverseExcludes {
+		if !excluded {
+			return false
+		}
+	} else {
+		if excluded {
+			return false
+		}
 	}
 	if s.skipUnsupported && !language.Supported(path) {
 		return false
