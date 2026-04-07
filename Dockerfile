@@ -1,6 +1,3 @@
-# Copyright 2026 The LicenseOps Authors
-# SPDX-License-Identifier: Apache-2.0
-
 FROM golang:1.26-alpine AS builder
 
 WORKDIR /build
