@@ -9,6 +9,7 @@ How to integrate lops into your CI/CD pipelines.
 | 0 | Success | All files compliant (check) or all fixed (fix) |
 | 1 | Non-compliant | Files found with missing/incorrect headers |
 | 2 | Error | Bad config, IO error, invalid license |
+| 3 | Partial failure | Some files errored and some are non-compliant |
 
 ---
 
