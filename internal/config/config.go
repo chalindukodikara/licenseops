@@ -90,7 +90,6 @@ func Load(path string) (Config, error) {
 	if fileCfg.Gitignore != nil {
 		cfg.Gitignore = fileCfg.Gitignore
 	}
-
 	return cfg, nil
 }
 
