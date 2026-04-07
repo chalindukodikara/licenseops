@@ -10,7 +10,7 @@ import (
 	"strings"
 	"testing"
 
-	"github.com/chalindukodikara/licenseops/internal/config"
+	"github.com/licenseops/licenseops/internal/config"
 )
 
 func createFile(t *testing.T, dir, relPath, content string) string {

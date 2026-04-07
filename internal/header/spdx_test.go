@@ -9,7 +9,7 @@ import (
 	"strings"
 	"testing"
 
-	"github.com/chalindukodikara/licenseops/internal/language"
+	"github.com/licenseops/licenseops/internal/language"
 )
 
 var (

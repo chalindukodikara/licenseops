@@ -11,7 +11,7 @@ import (
 	"strings"
 	"text/template"
 
-	"github.com/chalindukodikara/licenseops/internal/language"
+	"github.com/licenseops/licenseops/internal/language"
 )
 
 // CustomFormat implements a user-defined header template format.

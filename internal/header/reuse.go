@@ -8,7 +8,7 @@ import (
 	"regexp"
 	"strings"
 
-	"github.com/chalindukodikara/licenseops/internal/language"
+	"github.com/licenseops/licenseops/internal/language"
 )
 
 // ReuseFormat implements the FSFE REUSE specification header format.

@@ -10,10 +10,10 @@ import (
 	"sort"
 	"sync"
 
-	"github.com/chalindukodikara/licenseops/internal/config"
-	"github.com/chalindukodikara/licenseops/internal/header"
-	"github.com/chalindukodikara/licenseops/internal/language"
-	"github.com/chalindukodikara/licenseops/internal/scanner"
+	"github.com/licenseops/licenseops/internal/config"
+	"github.com/licenseops/licenseops/internal/header"
+	"github.com/licenseops/licenseops/internal/language"
+	"github.com/licenseops/licenseops/internal/scanner"
 )
 
 // Result holds the outcome of a check or fix operation.

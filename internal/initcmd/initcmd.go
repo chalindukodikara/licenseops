@@ -62,7 +62,7 @@ func GenerateConfig(license, holder, format string, extraExcludes []string) stri
 	var sb strings.Builder
 
 	sb.WriteString("# LicenseOps configuration\n")
-	sb.WriteString("# See: https://github.com/chalindukodikara/licenseops\n\n")
+	sb.WriteString("# See: https://github.com/licenseops/licenseops\n\n")
 
 	fmt.Fprintf(&sb, "license: %s\n", license)
 

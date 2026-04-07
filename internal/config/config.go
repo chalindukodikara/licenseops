@@ -8,7 +8,7 @@ import (
 	"os"
 	"time"
 
-	"github.com/chalindukodikara/licenseops/internal/spdx"
+	"github.com/licenseops/licenseops/internal/spdx"
 	"gopkg.in/yaml.v3"
 )
 
