@@ -8,7 +8,7 @@ import (
 	"strings"
 	"testing"
 
-	"github.com/chalindukodikara/licenseops/internal/engine"
+	"github.com/licenseops/licenseops/internal/engine"
 )
 
 func testResult() *engine.Result {

@@ -6,7 +6,7 @@ package output
 import (
 	"encoding/json"
 
-	"github.com/chalindukodikara/licenseops/internal/engine"
+	"github.com/licenseops/licenseops/internal/engine"
 )
 
 // FileEntry represents a single file in structured output.

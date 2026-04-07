@@ -11,10 +11,10 @@ import (
 
 	"github.com/spf13/cobra"
 
-	"github.com/chalindukodikara/licenseops/internal/config"
-	"github.com/chalindukodikara/licenseops/internal/engine"
-	"github.com/chalindukodikara/licenseops/internal/initcmd"
-	"github.com/chalindukodikara/licenseops/internal/output"
+	"github.com/licenseops/licenseops/internal/config"
+	"github.com/licenseops/licenseops/internal/engine"
+	"github.com/licenseops/licenseops/internal/initcmd"
+	"github.com/licenseops/licenseops/internal/output"
 )
 
 var version = "dev"
