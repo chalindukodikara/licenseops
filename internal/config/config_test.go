@@ -202,3 +202,145 @@ func TestDefaults(t *testing.T) {
 		t.Errorf("unexpected defaults: %+v", cfg)
 	}
 }
+
+func TestLoad_AllFields(t *testing.T) {
+	dir := t.TempDir()
+	p := filepath.Join(dir, ".licenseops.yaml")
+	yaml := `license: Apache-2.0
+copyright-holder: "Acme Corp"
+year: "2025"
+format: reuse
+header-template: /tmp/foo.tmpl
+paths:
+  - src/
+  - lib/
+exclude:
+  - "build/**"
+skip-generated: false
+gitignore: false
+`
+	os.WriteFile(p, []byte(yaml), 0o644)
+	cfg, err := Load(p)
+	if err != nil {
+		t.Fatal(err)
+	}
+	if cfg.License != "Apache-2.0" {
+		t.Errorf("license = %q", cfg.License)
+	}
+	if cfg.HeaderTemplate != "/tmp/foo.tmpl" {
+		t.Errorf("template = %q", cfg.HeaderTemplate)
+	}
+	if len(cfg.Paths) != 2 {
+		t.Errorf("paths = %v", cfg.Paths)
+	}
+	if cfg.ShouldSkipGenerated() {
+		t.Error("skip-generated false should be respected")
+	}
+	if cfg.ShouldUseGitignore() {
+		t.Error("gitignore false should be respected")
+	}
+}
+
+func TestValidate_ApacheLongValid(t *testing.T) {
+	cfg := Defaults()
+	cfg.License = "Apache-2.0"
+	cfg.Format = "apache-long"
+	cfg.CopyrightHolder = "Acme"
+	if _, err := cfg.Validate(); err != nil {
+		t.Errorf("unexpected error: %v", err)
+	}
+}
+
+func TestValidate_ApacheLongMissingHolder(t *testing.T) {
+	cfg := Defaults()
+	cfg.License = "Apache-2.0"
+	cfg.Format = "apache-long"
+	if _, err := cfg.Validate(); err == nil {
+		t.Error("apache-long without holder should error")
+	}
+}
+
+func TestValidate_GPLLongValid(t *testing.T) {
+	for _, lic := range []string{"GPL-3.0-only", "LGPL-2.1-only", "AGPL-3.0-or-later"} {
+		t.Run(lic, func(t *testing.T) {
+			cfg := Defaults()
+			cfg.License = lic
+			cfg.Format = "gpl-long"
+			cfg.CopyrightHolder = "Acme"
+			if _, err := cfg.Validate(); err != nil {
+				t.Errorf("unexpected error: %v", err)
+			}
+		})
+	}
+}
+
+func TestValidate_GPLLongMissingHolder(t *testing.T) {
+	cfg := Defaults()
+	cfg.License = "GPL-3.0-only"
+	cfg.Format = "gpl-long"
+	if _, err := cfg.Validate(); err == nil {
+		t.Error("gpl-long without holder should error")
+	}
+}
+
+func TestValidate_CustomMissingFile(t *testing.T) {
+	cfg := Defaults()
+	cfg.License = "MIT"
+	cfg.Format = "custom"
+	cfg.HeaderTemplate = "/nonexistent/template.tmpl"
+	if _, err := cfg.Validate(); err == nil {
+		t.Error("custom with missing template file should error")
+	}
+}
+
+func TestValidate_ReuseValid(t *testing.T) {
+	cfg := Defaults()
+	cfg.License = "MIT"
+	cfg.Format = "reuse"
+	cfg.CopyrightHolder = "Acme"
+	if _, err := cfg.Validate(); err != nil {
+		t.Errorf("unexpected error: %v", err)
+	}
+}
+
+func TestValidate_ExpressionLicense(t *testing.T) {
+	cfg := Defaults()
+	cfg.License = "Apache-2.0 OR MIT"
+	if _, err := cfg.Validate(); err != nil {
+		t.Errorf("expression should be valid: %v", err)
+	}
+}
+
+func TestValidate_InvalidLicenseID(t *testing.T) {
+	cfg := Defaults()
+	cfg.License = "INVALID-1.0"
+	if _, err := cfg.Validate(); err == nil {
+		t.Error("invalid license should error")
+	}
+}
+
+func TestShouldSkipGenerated_FalseValue(t *testing.T) {
+	f := false
+	cfg := Config{SkipGenerated: &f}
+	if cfg.ShouldSkipGenerated() {
+		t.Error("explicit false should be respected")
+	}
+}
+
+func TestShouldUseGitignore_FalseValue(t *testing.T) {
+	f := false
+	cfg := Config{Gitignore: &f}
+	if cfg.ShouldUseGitignore() {
+		t.Error("explicit false should be respected")
+	}
+}
+
+func TestLoad_PathsReplacedNotAppended(t *testing.T) {
+	dir := t.TempDir()
+	p := filepath.Join(dir, ".licenseops.yaml")
+	os.WriteFile(p, []byte("license: MIT\npaths:\n  - src/\n  - test/\n"), 0o644)
+	cfg, _ := Load(p)
+	if len(cfg.Paths) != 2 || cfg.Paths[0] != "src/" || cfg.Paths[1] != "test/" {
+		t.Errorf("paths should be replaced, got %v", cfg.Paths)
+	}
+}

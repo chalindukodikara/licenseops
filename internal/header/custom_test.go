@@ -104,3 +104,64 @@ func TestCustom_StripExisting_NoTemplate(t *testing.T) {
 		t.Error("should be unchanged without template")
 	}
 }
+
+func TestCustom_Name(t *testing.T) {
+	if (&CustomFormat{}).Name() != "custom" {
+		t.Error("Name should be 'custom'")
+	}
+}
+
+func TestCustom_Generate_Block(t *testing.T) {
+	f := setupCustomFormat(t, "{{.BlockStart}} Year: {{.Year}} License: {{.License}} {{.BlockEnd}}")
+	got := f.Generate(blockC, "2026", "Acme", "MIT")
+	if !strings.Contains(got, "/*") || !strings.Contains(got, "*/") {
+		t.Errorf("block style not used:\n%s", got)
+	}
+	if !strings.Contains(got, "Year: 2026 License: MIT") {
+		t.Errorf("template variables not substituted:\n%s", got)
+	}
+}
+
+func TestCustom_HasValid_Missing(t *testing.T) {
+	f := setupCustomFormat(t, "{{.Comment}} Copyright {{.Year}} {{.Holder}}\n{{.Comment}} License: {{.License}}")
+	dir := t.TempDir()
+	p := filepath.Join(dir, "main.go")
+	os.WriteFile(p, []byte("package main\n"), 0o644)
+	valid, _ := f.HasValid(p, lineSlash, "Acme", "MIT")
+	if valid {
+		t.Error("expected invalid for file without header")
+	}
+}
+
+func TestCustom_HasValid_TooShort(t *testing.T) {
+	f := setupCustomFormat(t, "{{.Comment}} Copyright {{.Year}} {{.Holder}}\n{{.Comment}} License: {{.License}}")
+	dir := t.TempDir()
+	p := filepath.Join(dir, "main.go")
+	os.WriteFile(p, []byte("// Copyright 2026 Acme\n"), 0o644)
+	valid, _ := f.HasValid(p, lineSlash, "Acme", "MIT")
+	if valid {
+		t.Error("expected invalid for header without enough lines")
+	}
+}
+
+func TestCustom_HasValid_WrongHolder(t *testing.T) {
+	f := setupCustomFormat(t, "{{.Comment}} Copyright {{.Year}} {{.Holder}}\n{{.Comment}} License: {{.License}}")
+	dir := t.TempDir()
+	p := filepath.Join(dir, "main.go")
+	os.WriteFile(p, []byte("// Copyright 2026 Other\n// License: MIT\n\npackage main\n"), 0o644)
+	valid, _ := f.HasValid(p, lineSlash, "Acme", "MIT")
+	if valid {
+		t.Error("expected invalid for wrong holder")
+	}
+}
+
+func TestCustom_HasValid_NoBlankAfter(t *testing.T) {
+	f := setupCustomFormat(t, "{{.Comment}} Copyright {{.Year}} {{.Holder}}\n{{.Comment}} License: {{.License}}")
+	dir := t.TempDir()
+	p := filepath.Join(dir, "main.go")
+	os.WriteFile(p, []byte("// Copyright 2026 Acme\n// License: MIT\npackage main\n"), 0o644)
+	valid, _ := f.HasValid(p, lineSlash, "Acme", "MIT")
+	if valid {
+		t.Error("expected invalid when header is not followed by a blank line")
+	}
+}

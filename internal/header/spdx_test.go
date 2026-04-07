@@ -188,3 +188,82 @@ func TestSPDX_Idempotency_Block(t *testing.T) {
 		t.Error("block idempotency failed")
 	}
 }
+
+func TestSPDX_Name(t *testing.T) {
+	if (&SPDXFormat{}).Name() != "spdx" {
+		t.Error("Name should be 'spdx'")
+	}
+}
+
+// --- 1-line block mode ---
+
+func TestSPDX_HasValid_1Line_Block(t *testing.T) {
+	dir := t.TempDir()
+	p := filepath.Join(dir, "style.css")
+	os.WriteFile(p, []byte("/* SPDX-License-Identifier: MIT */\n\n.body {}\n"), 0o644)
+	valid, _ := (&SPDXFormat{}).HasValid(p, blockC, "", "MIT")
+	if !valid {
+		t.Error("expected valid for 1-line block")
+	}
+}
+
+func TestSPDX_HasValid_1Line_Block_WrongLicense(t *testing.T) {
+	dir := t.TempDir()
+	p := filepath.Join(dir, "style.css")
+	os.WriteFile(p, []byte("/* SPDX-License-Identifier: MIT */\n\n.body {}\n"), 0o644)
+	valid, _ := (&SPDXFormat{}).HasValid(p, blockC, "", "Apache-2.0")
+	if valid {
+		t.Error("expected invalid for wrong 1-line block license")
+	}
+}
+
+func TestSPDX_HasValid_1Line_NoBlankLine(t *testing.T) {
+	dir := t.TempDir()
+	p := filepath.Join(dir, "main.go")
+	os.WriteFile(p, []byte("// SPDX-License-Identifier: MIT\npackage main\n"), 0o644)
+	valid, _ := (&SPDXFormat{}).HasValid(p, lineSlash, "", "MIT")
+	if valid {
+		t.Error("expected invalid when blank line missing after 1-line header")
+	}
+}
+
+func TestSPDX_HasValid_2Line_Block_WrongStart(t *testing.T) {
+	dir := t.TempDir()
+	p := filepath.Join(dir, "style.css")
+	os.WriteFile(p, []byte("notblock\n Copyright 2026 Acme\n SPDX-License-Identifier: MIT\n*/\n\n.body {}\n"), 0o644)
+	valid, _ := (&SPDXFormat{}).HasValid(p, blockC, "Acme", "MIT")
+	if valid {
+		t.Error("expected invalid when block start is wrong")
+	}
+}
+
+func TestSPDX_HasValid_2Line_Block_WrongHolder(t *testing.T) {
+	dir := t.TempDir()
+	p := filepath.Join(dir, "style.css")
+	os.WriteFile(p, []byte("/*\n Copyright 2026 Other\n SPDX-License-Identifier: MIT\n*/\n\n.body {}\n"), 0o644)
+	valid, _ := (&SPDXFormat{}).HasValid(p, blockC, "Acme", "MIT")
+	if valid {
+		t.Error("expected invalid for wrong holder in block")
+	}
+}
+
+func TestSPDX_HasValid_2Line_Block_WrongEnd(t *testing.T) {
+	dir := t.TempDir()
+	p := filepath.Join(dir, "style.css")
+	os.WriteFile(p, []byte("/*\n Copyright 2026 Acme\n SPDX-License-Identifier: MIT\nnotend\n.body {}\n"), 0o644)
+	valid, _ := (&SPDXFormat{}).HasValid(p, blockC, "Acme", "MIT")
+	if valid {
+		t.Error("expected invalid when block end is wrong")
+	}
+}
+
+func TestSPDX_StripExisting_1LineBlock(t *testing.T) {
+	f := &SPDXFormat{}
+	got := string(f.StripExisting([]byte("/* SPDX-License-Identifier: MIT */\n\n.body {}\n"), blockC))
+	if strings.Contains(got, "SPDX-License-Identifier") {
+		t.Errorf("1-line block should be stripped, got:\n%s", got)
+	}
+	if !strings.Contains(got, ".body {}") {
+		t.Errorf("body should be preserved, got:\n%s", got)
+	}
+}

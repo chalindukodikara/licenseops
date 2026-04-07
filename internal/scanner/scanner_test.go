@@ -142,3 +142,53 @@ func TestScan_DirectoryExclude_SkipsVendor(t *testing.T) {
 		t.Errorf("expected 1, got %d", len(files))
 	}
 }
+
+func TestScan_NonExistentPath(t *testing.T) {
+	_, err := New("/nonexistent", nil, false).Scan([]string{"/totally/missing/path"})
+	if err == nil {
+		t.Error("expected error for nonexistent path")
+	}
+}
+
+func TestScan_SingleFile_Excluded(t *testing.T) {
+	dir := t.TempDir()
+	createFile(t, dir, "main.go", "package main")
+	files, _ := New(dir, []string{"main.go"}, false).Scan([]string{filepath.Join(dir, "main.go")})
+	if len(files) != 0 {
+		t.Errorf("excluded single file should not be returned, got %d", len(files))
+	}
+}
+
+func TestScan_SingleFile_Unsupported(t *testing.T) {
+	dir := t.TempDir()
+	createFile(t, dir, "data.json", "{}")
+	files, _ := New(dir, nil, false).Scan([]string{filepath.Join(dir, "data.json")})
+	if len(files) != 0 {
+		t.Errorf("unsupported single file should not be returned, got %d", len(files))
+	}
+}
+
+func TestScan_FilenamePatternMatch(t *testing.T) {
+	dir := t.TempDir()
+	createFile(t, dir, "a.go", "package a")
+	createFile(t, dir, "b.go", "package b")
+	createFile(t, dir, "nested/a.go", "package a")
+	// "a.go" pattern without slash should match by basename anywhere
+	files, _ := New(dir, []string{"a.go"}, false).Scan([]string{dir})
+	for _, f := range files {
+		if filepath.Base(f) == "a.go" {
+			t.Errorf("a.go should be excluded by basename pattern, got %s", f)
+		}
+	}
+}
+
+func TestScan_DoublestarPattern(t *testing.T) {
+	dir := t.TempDir()
+	createFile(t, dir, "main.go", "package main")
+	createFile(t, dir, "src/util.go", "package util")
+	createFile(t, dir, "src/sub/deep.go", "package sub")
+	files, _ := New(dir, []string{"src/**"}, false).Scan([]string{dir})
+	if len(files) != 1 {
+		t.Errorf("expected 1 (only main.go), got %d: %v", len(files), files)
+	}
+}
