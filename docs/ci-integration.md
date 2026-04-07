@@ -29,7 +29,7 @@ jobs:
 
       - name: Install lops
         run: |
-          curl -sSL https://github.com/chalindukodikara/licenseops/releases/latest/download/licenser_Linux_x86_64.tar.gz | tar xz
+          curl -sSL https://github.com/licenseops/licenseops/releases/latest/download/licenser_Linux_x86_64.tar.gz | tar xz
           sudo mv lops /usr/local/bin/
 
       - name: Check license headers
@@ -44,7 +44,7 @@ jobs:
           go-version: '1.26'
 
       - name: Install lops
-        run: go install github.com/chalindukodikara/licenseops/cmd/lops@latest
+        run: go install github.com/licenseops/licenseops/cmd/lops@latest
 
       - name: Check license headers
         run: lops check
@@ -58,7 +58,7 @@ jobs:
           docker run --rm \
             -v "${{ github.workspace }}":/src \
             -w /src \
-            ghcr.io/chalindukodikara/licenseops check
+            ghcr.io/licenseops/licenseops check
 ```
 
 ### Auto-Fix on PR (Commit Changes)
@@ -80,7 +80,7 @@ jobs:
 
       - name: Install lops
         run: |
-          curl -sSL https://github.com/chalindukodikara/licenseops/releases/latest/download/licenser_Linux_x86_64.tar.gz | tar xz
+          curl -sSL https://github.com/licenseops/licenseops/releases/latest/download/licenser_Linux_x86_64.tar.gz | tar xz
           sudo mv lops /usr/local/bin/
 
       - name: Fix license headers
@@ -109,7 +109,7 @@ jobs:
           go-version-file: go.mod
 
       - name: Install lops
-        run: go install github.com/chalindukodikara/licenseops/cmd/lops@latest
+        run: go install github.com/licenseops/licenseops/cmd/lops@latest
 
       - name: License headers
         run: lops check
@@ -130,7 +130,7 @@ license-check:
   image: golang:1.26-alpine
   stage: lint
   script:
-    - go install github.com/chalindukodikara/licenseops/cmd/lops@latest
+    - go install github.com/licenseops/licenseops/cmd/lops@latest
     - lops check
   rules:
     - if: $CI_MERGE_REQUEST_ID
@@ -146,14 +146,14 @@ Add to `.pre-commit-config.yaml`:
 
 ```yaml
 repos:
-  - repo: https://github.com/chalindukodikara/licenseops
+  - repo: https://github.com/licenseops/licenseops
     rev: v0.1.0
     hooks:
       - id: lops-check
         name: Check license headers
         entry: lops check
         language: golang
-        additional_dependencies: ["github.com/chalindukodikara/licenseops/cmd/lops@v0.1.0"]
+        additional_dependencies: ["github.com/licenseops/licenseops/cmd/lops@v0.1.0"]
         always_run: true
         pass_filenames: false
 ```
@@ -162,14 +162,14 @@ repos:
 
 ```yaml
 repos:
-  - repo: https://github.com/chalindukodikara/licenseops
+  - repo: https://github.com/licenseops/licenseops
     rev: v0.1.0
     hooks:
       - id: lops-fix
         name: Fix license headers
         entry: lops fix
         language: golang
-        additional_dependencies: ["github.com/chalindukodikara/licenseops/cmd/lops@v0.1.0"]
+        additional_dependencies: ["github.com/licenseops/licenseops/cmd/lops@v0.1.0"]
         always_run: true
         pass_filenames: false
 ```
@@ -204,25 +204,25 @@ Then use in CI:
 ### Check a Local Project
 
 ```bash
-docker run --rm -v "$(pwd)":/src -w /src ghcr.io/chalindukodikara/licenseops check
+docker run --rm -v "$(pwd)":/src -w /src ghcr.io/licenseops/licenseops check
 ```
 
 ### Fix a Local Project
 
 ```bash
-docker run --rm -v "$(pwd)":/src -w /src ghcr.io/chalindukodikara/licenseops fix
+docker run --rm -v "$(pwd)":/src -w /src ghcr.io/licenseops/licenseops fix
 ```
 
 ### With Custom Config
 
 ```bash
-docker run --rm -v "$(pwd)":/src -w /src ghcr.io/chalindukodikara/licenseops check -c my-config.yaml
+docker run --rm -v "$(pwd)":/src -w /src ghcr.io/licenseops/licenseops check -c my-config.yaml
 ```
 
 ### Override All Settings via Flags
 
 ```bash
-docker run --rm -v "$(pwd)":/src -w /src ghcr.io/chalindukodikara/licenseops check \
+docker run --rm -v "$(pwd)":/src -w /src ghcr.io/licenseops/licenseops check \
   -l "Apache-2.0" \
   -o "My Org" \
   -f spdx

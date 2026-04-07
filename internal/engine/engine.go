@@ -78,6 +78,13 @@ func (e *Engine) SetWarnings(w []string) {
 	e.warnings = w
 }
 
+// SetInverseExcludes flips the scanner's exclude semantics. When true, only
+// files MATCHING exclude patterns are returned by the scanner. Useful for
+// `lops remove --excluded-only` to clean up headers in excluded files.
+func (e *Engine) SetInverseExcludes(b bool) {
+	e.scanner.SetInverseExcludes(b)
+}
+
 // Check scans files and reports which ones are non-compliant.
 func (e *Engine) Check(verbose bool) (*Result, error) {
 	return e.run(false, false, verbose)

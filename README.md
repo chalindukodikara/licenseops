@@ -77,9 +77,15 @@ lops fix --diff
 **Remove** all headers:
 
 ```bash
-lops remove --dry-run    # preview first
-lops remove              # then remove
+lops remove --dry-run                    # preview first
+lops remove                              # then remove
+lops remove --excluded-only --dry-run    # preview cleanup of excluded files
+lops remove --excluded-only              # strip headers from files in your exclude list
 ```
+
+`--excluded-only` inverts the scan: it walks the tree and processes only files
+that match an `exclude:` pattern in your `.licenseops.yaml`. Useful right after
+adding new excludes to clean up leftover headers in those files.
 
 **Config file** — create `.licenseops.yaml` in your project root (or use `lops init`):
 
@@ -148,6 +154,24 @@ lops remove              # strip all recognized headers
 
 Even if your config says `format: spdx`, `remove` will detect and strip Apache, GPL, REUSE, and custom headers too.
 
+### Cleaning up headers in excluded files
+
+When you add a new entry to your `exclude:` list (e.g. `Dockerfile`,
+`.github/workflows/**`), files that already had a header keep it because
+`lops check` and `lops fix` skip excluded paths. Use `--excluded-only` to
+strip headers from those files in one shot:
+
+```bash
+lops remove --excluded-only --dry-run    # preview which excluded files have headers
+lops remove --excluded-only              # strip them
+```
+
+This inverts the scanner: it walks the entire tree but only processes files
+matching a pattern in your `.licenseops.yaml` `exclude:` block. Built-in
+defaults (`.git/**`, `vendor/**`, `node_modules/**`, `third_party/**`,
+`.licenseops.yaml`) and gitignore filtering are intentionally ignored in this
+mode, so the cleanup targets exactly what you declared excluded.
+
 ## Configuration
 
 `lops` automatically looks for `.licenseops.yaml` in the current directory. If not found, it silently uses built-in defaults — no error. You can always override with CLI flags, or skip the config file entirely.
@@ -175,15 +199,17 @@ gitignore: true                    # respect .gitignore patterns
 ### CLI Flags
 
 ```
--l, --license     SPDX license identifier or expression
--o, --owner       copyright holder
--f, --format      header format (spdx, reuse, apache-long, gpl-long, custom)
--y, --year        copyright year
--c, --config      config file path (default: .licenseops.yaml)
--v, --verbose     show status of every file
-    --dry-run     preview changes without modifying files (fix/remove)
-    --diff        show unified diff of changes (fix, implies dry-run)
-    --output      output format: text (default), json, sarif
+-l, --license         SPDX license identifier or expression
+-o, --owner           copyright holder
+-f, --format          header format (spdx, reuse, apache-long, gpl-long, custom)
+-y, --year            copyright year
+-c, --config          config file path (default: .licenseops.yaml)
+-v, --verbose         show status of every file
+    --dry-run         preview changes without modifying files (fix/remove)
+    --diff            show unified diff of changes (fix, implies dry-run)
+    --excluded-only   invert scan; process only files matching exclude
+                      patterns from your config (remove only)
+    --output          output format: text (default), json, sarif
 ```
 
 Precedence: **CLI flags > config file > defaults**

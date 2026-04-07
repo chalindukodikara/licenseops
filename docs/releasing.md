@@ -22,13 +22,13 @@ When a PR is merged (push to `main`), the same CI jobs run, plus:
 
 | Job | What it does |
 |-----|--------------|
-| `docker-latest-dev` | Builds and pushes `ghcr.io/chalindukodikara/licenseops:latest-dev` |
+| `docker-latest-dev` | Builds and pushes `ghcr.io/licenseops/licenseops:latest-dev` |
 
 This means the `:latest-dev` Docker tag **always tracks the `main` branch**. Every merge to `main` updates it.
 
 ```bash
 # Always gets the latest main build (may be unreleased)
-docker pull ghcr.io/chalindukodikara/licenseops:latest-dev
+docker pull ghcr.io/licenseops/licenseops:latest-dev
 ```
 
 ## Creating a Release
@@ -36,7 +36,7 @@ docker pull ghcr.io/chalindukodikara/licenseops:latest-dev
 ### Prerequisites
 
 - Push access to the repository
-- Check [existing releases](https://github.com/chalindukodikara/licenseops/releases) for the latest version number
+- Check [existing releases](https://github.com/licenseops/licenseops/releases) for the latest version number
 
 Export the environment variables for use in subsequent steps:
 
@@ -44,7 +44,7 @@ Export the environment variables for use in subsequent steps:
 export MAJOR_VERSION=<MAJOR>
 export MINOR_VERSION=<MINOR>
 export PATCH_VERSION=<PATCH>
-export GIT_REMOTE=origin  # remote name for github.com/chalindukodikara/licenseops
+export GIT_REMOTE=origin  # remote name for github.com/licenseops/licenseops
 ```
 
 ---
@@ -70,7 +70,7 @@ Skip these steps if you are creating a patch release.
     ```bash
     git push ${GIT_REMOTE} release-v${MAJOR_VERSION}.${MINOR_VERSION}
     ```
-- [ ] Wait for [CI](https://github.com/chalindukodikara/licenseops/actions/workflows/ci.yml) to pass on the release branch.
+- [ ] Wait for [CI](https://github.com/licenseops/licenseops/actions/workflows/ci.yml) to pass on the release branch.
 - [ ] Proceed to [Tag the Release](#tag-the-release).
 
 ---
@@ -94,7 +94,7 @@ Skip these steps if you are creating a major or minor release.
     ```bash
     git push ${GIT_REMOTE} release-v${MAJOR_VERSION}.${MINOR_VERSION}
     ```
-- [ ] Wait for [CI](https://github.com/chalindukodikara/licenseops/actions/workflows/ci.yml) to pass on the release branch.
+- [ ] Wait for [CI](https://github.com/licenseops/licenseops/actions/workflows/ci.yml) to pass on the release branch.
 - [ ] Proceed to [Tag the Release](#tag-the-release).
 
 ---
@@ -106,8 +106,8 @@ Skip these steps if you are creating a major or minor release.
     git tag v${MAJOR_VERSION}.${MINOR_VERSION}.${PATCH_VERSION}
     git push ${GIT_REMOTE} v${MAJOR_VERSION}.${MINOR_VERSION}.${PATCH_VERSION}
     ```
-- [ ] Wait for [Release](https://github.com/chalindukodikara/licenseops/actions/workflows/release.yml) to pass — see [What Gets Created](#what-gets-created).
-- [ ] Verify the [draft release](https://github.com/chalindukodikara/licenseops/releases) created by the workflow.
+- [ ] Wait for [Release](https://github.com/licenseops/licenseops/actions/workflows/release.yml) to pass — see [What Gets Created](#what-gets-created).
+- [ ] Verify the [draft release](https://github.com/licenseops/licenseops/releases) created by the workflow.
 - [ ] Edit the release notes if needed (add summary, highlights, breaking changes, upgrade instructions).
     For **major releases**, add a **Breaking Changes** section and include migration instructions.
 - [ ] Mark as **Latest** if this is the latest release. (If the current release is v0.1.1 while v0.2.0 exists, skip marking as latest.)
@@ -136,9 +136,9 @@ When the tag is pushed, the release workflow (`release.yml`) runs:
   - **Other** — everything else (excludes `docs:`, `test:`, `ci:`, `chore:`)
 
 **Docker images** (pushed to GHCR):
-- `ghcr.io/chalindukodikara/licenseops:0.2.0` — exact version
-- `ghcr.io/chalindukodikara/licenseops:0.2` — major.minor (moves with patch releases)
-- `ghcr.io/chalindukodikara/licenseops:latest` — latest release
+- `ghcr.io/licenseops/licenseops:0.2.0` — exact version
+- `ghcr.io/licenseops/licenseops:0.2` — major.minor (moves with patch releases)
+- `ghcr.io/licenseops/licenseops:latest` — latest release
 
 ### Commit Message Convention
 
