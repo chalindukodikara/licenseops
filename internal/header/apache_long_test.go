@@ -69,3 +69,50 @@ func TestApacheLong_Idempotency(t *testing.T) {
 		t.Error("idempotency failed")
 	}
 }
+
+func TestApacheLong_Name(t *testing.T) {
+	if (&ApacheLongFormat{}).Name() != "apache-long" {
+		t.Error("Name should be 'apache-long'")
+	}
+}
+
+func TestApacheLong_Generate_Hash(t *testing.T) {
+	got := (&ApacheLongFormat{}).Generate(lineHash, "2026", "Acme", "Apache-2.0")
+	if !strings.HasPrefix(got, "# Copyright 2026 Acme") {
+		t.Errorf("hash style wrong:\n%s", got)
+	}
+	if !strings.Contains(got, "# Licensed under the Apache License") {
+		t.Errorf("hash anchor missing:\n%s", got)
+	}
+}
+
+func TestApacheLong_HasValid_TooShort(t *testing.T) {
+	dir := t.TempDir()
+	p := filepath.Join(dir, "main.go")
+	os.WriteFile(p, []byte("// Copyright 2026 Acme\n// short\npackage main\n"), 0o644)
+	valid, _ := (&ApacheLongFormat{}).HasValid(p, lineSlash, "Acme", "Apache-2.0")
+	if valid {
+		t.Error("short header should not be valid Apache")
+	}
+}
+
+func TestApacheLong_HasValid_WrongHolder(t *testing.T) {
+	dir := t.TempDir()
+	f := &ApacheLongFormat{}
+	hdr := f.Generate(lineSlash, "2026", "Other", "Apache-2.0")
+	p := filepath.Join(dir, "main.go")
+	os.WriteFile(p, []byte(hdr+"\n\npackage main\n"), 0o644)
+	valid, _ := f.HasValid(p, lineSlash, "Acme", "Apache-2.0")
+	if valid {
+		t.Error("expected invalid for wrong holder")
+	}
+}
+
+func TestApacheLong_StripExisting_Block(t *testing.T) {
+	f := &ApacheLongFormat{}
+	hdr := f.Generate(blockC, "2026", "Acme", "Apache-2.0")
+	got := string(f.StripExisting([]byte(hdr+"\n\n.body {}\n"), blockC))
+	if strings.Contains(got, "Apache License") {
+		t.Errorf("block Apache header should be stripped, got:\n%s", got)
+	}
+}

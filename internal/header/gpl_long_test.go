@@ -65,3 +65,59 @@ func TestGPLLong_Idempotency(t *testing.T) {
 		}
 	}
 }
+
+func TestGPLLong_Name(t *testing.T) {
+	if (&GPLLongFormat{}).Name() != "gpl-long" {
+		t.Error("Name should be 'gpl-long'")
+	}
+}
+
+func TestGPLLong_Generate_Block(t *testing.T) {
+	got := (&GPLLongFormat{}).Generate(blockC, "2026", "Acme Corp", "GPL-3.0-only")
+	if !strings.HasPrefix(got, "/*") || !strings.HasSuffix(got, "*/") {
+		t.Errorf("block wrong:\n%s", got)
+	}
+	if !strings.Contains(got, "GNU General Public License") {
+		t.Errorf("expected GPL text in block:\n%s", got)
+	}
+}
+
+func TestGPLLong_Generate_Hash(t *testing.T) {
+	got := (&GPLLongFormat{}).Generate(lineHash, "2026", "Acme Corp", "GPL-3.0-only")
+	if !strings.HasPrefix(got, "# Copyright 2026 Acme Corp") {
+		t.Errorf("hash style wrong:\n%s", got)
+	}
+}
+
+func TestGPLLong_Generate_GPL2_Version(t *testing.T) {
+	got := (&GPLLongFormat{}).Generate(lineSlash, "2026", "Acme Corp", "GPL-2.0-only")
+	if !strings.Contains(got, "version 2") {
+		t.Errorf("GPL-2.0 should produce 'version 2', got:\n%s", got)
+	}
+}
+
+func TestGPLLong_Generate_LGPL2_Version(t *testing.T) {
+	got := (&GPLLongFormat{}).Generate(lineSlash, "2026", "Acme Corp", "LGPL-2.1-only")
+	if !strings.Contains(got, "version 2") {
+		t.Errorf("LGPL-2.1 should produce 'version 2', got:\n%s", got)
+	}
+}
+
+func TestGPLLong_HasValid_TooShort(t *testing.T) {
+	dir := t.TempDir()
+	p := filepath.Join(dir, "main.go")
+	os.WriteFile(p, []byte("// Copyright 2026 Acme\n// short\npackage main\n"), 0o644)
+	valid, _ := (&GPLLongFormat{}).HasValid(p, lineSlash, "Acme", "GPL-3.0-only")
+	if valid {
+		t.Error("short header should not be valid GPL")
+	}
+}
+
+func TestGPLLong_StripExisting_Block(t *testing.T) {
+	f := &GPLLongFormat{}
+	hdr := f.Generate(blockC, "2026", "Acme", "GPL-3.0-only")
+	got := string(f.StripExisting([]byte(hdr+"\n\n.body {}\n"), blockC))
+	if strings.Contains(got, "GNU General Public License") {
+		t.Errorf("block GPL header should be stripped, got:\n%s", got)
+	}
+}
