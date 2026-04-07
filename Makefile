@@ -1,9 +1,9 @@
-# Copyright 2026 Chalindu Kodikara
+# Copyright 2026 The LicenseOps Authors
 # SPDX-License-Identifier: Apache-2.0
 
 BINARY := lops
 CMD := ./cmd/lops
-MODULE := github.com/chalindukodikara/licenseops
+MODULE := github.com/licenseops/licenseops
 VERSION ?= dev
 LDFLAGS := -ldflags "-s -w -X main.version=$(VERSION)"
 

@@ -22,30 +22,30 @@ A fast CLI tool to check, fix, and migrate license headers across 50+ languages.
 
 ### Binary
 
-Download from [Releases](https://github.com/chalindukodikara/licenseops/releases):
+Download from [Releases](https://github.com/licenseops/licenseops/releases):
 
 ```bash
-curl -sSL https://github.com/chalindukodikara/licenseops/releases/latest/download/lops_Linux_x86_64.tar.gz | tar xz
+curl -sSL https://github.com/licenseops/licenseops/releases/latest/download/lops_Linux_x86_64.tar.gz | tar xz
 sudo mv lops /usr/local/bin/
 ```
 
 ### Go install
 
 ```bash
-go install github.com/chalindukodikara/licenseops/cmd/lops@latest
+go install github.com/licenseops/licenseops/cmd/lops@latest
 ```
 
 ### Docker
 
 ```bash
 # Latest stable release
-docker run --rm -v "$PWD":/src -w /src ghcr.io/chalindukodikara/licenseops:latest check
+docker run --rm -v "$PWD":/src -w /src ghcr.io/licenseops/licenseops:latest check
 
 # Pinned to exact version
-docker run --rm -v "$PWD":/src -w /src ghcr.io/chalindukodikara/licenseops:0.1.0 check
+docker run --rm -v "$PWD":/src -w /src ghcr.io/licenseops/licenseops:0.1.0 check
 
 # Latest development build (tracks main branch)
-docker run --rm -v "$PWD":/src -w /src ghcr.io/chalindukodikara/licenseops:latest-dev check
+docker run --rm -v "$PWD":/src -w /src ghcr.io/licenseops/licenseops:latest-dev check
 ```
 
 ## Quick Start
@@ -202,7 +202,7 @@ lops check -l "GPL-3.0-only WITH Classpath-exception-2.0" -o "Acme Corp" .
 ```yaml
 - name: Check license headers
   run: |
-    curl -sSL https://github.com/chalindukodikara/licenseops/releases/latest/download/lops_Linux_x86_64.tar.gz | tar xz
+    curl -sSL https://github.com/licenseops/licenseops/releases/latest/download/lops_Linux_x86_64.tar.gz | tar xz
     ./lops check
 ```
 
