@@ -8,7 +8,7 @@ import (
 	"regexp"
 	"strings"
 
-	"github.com/chalindukodikara/licenseops/internal/language"
+	"github.com/licenseops/licenseops/internal/language"
 )
 
 // SPDXFormat implements the SPDX short-form header format.

@@ -9,7 +9,7 @@ import (
 	"regexp"
 	"strings"
 
-	"github.com/chalindukodikara/licenseops/internal/language"
+	"github.com/licenseops/licenseops/internal/language"
 )
 
 // Shared regex patterns used by multiple formats.

@@ -9,7 +9,7 @@ import (
 	"strings"
 	"testing"
 
-	"github.com/chalindukodikara/licenseops/internal/language"
+	"github.com/licenseops/licenseops/internal/language"
 )
 
 func TestReuse_Generate_Line(t *testing.T) {
